@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import type { ExerciseInstance } from '../../content/types'
 import { grade } from '../../engine/grading'
 import type { GradeResult } from '../../engine/grading'
+import { useSettings } from '../../store/settings'
 import { Sentence } from './MultipleChoice'
 
 interface Props {
@@ -19,6 +20,7 @@ export default function Cloze({ exercise, onAnswer, disabled }: Props) {
   const [value, setValue] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const foldDiacritics = useSettings((s) => s.foldDiacritics)
 
   function submit() {
     if (disabled || submitted || !value.trim()) return
@@ -26,6 +28,7 @@ export default function Cloze({ exercise, onAnswer, disabled }: Props) {
     const result = grade(value, [exercise.answer, ...exercise.accepted], {
       lang: exercise.lang,
       strictSuffixLen: exercise.strictSuffixLen,
+      foldDiacritics,
     })
     onAnswer(result.correct, result, value)
   }

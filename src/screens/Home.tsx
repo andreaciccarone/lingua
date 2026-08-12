@@ -3,7 +3,10 @@ import { Link } from 'wouter'
 import { BookA, Check, Flame, Lock } from 'lucide-react'
 import { ES_TOPIC_BY_ID, ES_UNITS } from '../content/es'
 import { ES_PACKS } from '../content/es/packs'
-import { getAllLessons } from '../data/db'
+import { getAllLessons, getDays } from '../data/db'
+import { computeStreak, xpOn } from '../data/stats'
+import { todayLocal } from '../lib/dates'
+import { useSettings } from '../store/settings'
 
 const DE_UNITS = [
   'Erste Schritte',
@@ -17,12 +20,20 @@ const DE_UNITS = [
 export default function Home() {
   const [lang, setLang] = useState<'es' | 'de'>('es')
   const [completed, setCompleted] = useState<Set<string>>(new Set())
+  const [streak, setStreak] = useState(0)
+  const [todayXp, setTodayXp] = useState(0)
+  const dailyGoalXp = useSettings((s) => s.dailyGoalXp)
 
   useEffect(() => {
     getAllLessons().then((all) =>
       setCompleted(new Set(all.map((l) => l.lessonId.split('/')[0]))),
     )
-  }, [])
+    getDays().then((days) => {
+      const today = todayLocal()
+      setStreak(computeStreak(days, today, dailyGoalXp).current)
+      setTodayXp(xpOn(days, today))
+    })
+  }, [dailyGoalXp])
 
   const isTopicUnlocked = (topicId: string): boolean => {
     const topic = ES_TOPIC_BY_ID.get(topicId)
@@ -34,9 +45,18 @@ export default function Home() {
     <div className="pt-4">
       <header className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Lingua</h1>
-        <div className="flex items-center gap-1 text-orange-500">
-          <Flame size={20} />
-          <span className="font-semibold">0</span>
+        <div className="flex items-center gap-3">
+          <span
+            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+              todayXp >= dailyGoalXp ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'
+            }`}
+          >
+            {todayXp}/{dailyGoalXp} XP
+          </span>
+          <div className={`flex items-center gap-1 ${streak > 0 ? 'text-orange-500' : 'text-slate-300'}`}>
+            <Flame size={20} />
+            <span className="font-semibold">{streak}</span>
+          </div>
         </div>
       </header>
 

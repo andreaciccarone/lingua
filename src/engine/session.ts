@@ -10,7 +10,7 @@ import { ES_VERB_BY_ID } from '../content/es/morphology/verbs'
 import { ES_NOUN_BY_ID } from '../content/es/morphology/nouns'
 import { ES_ADJ_BY_ID } from '../content/es/morphology/adjectives'
 import { ES_LEXEME_BY_KEY, ES_PACKS, packLexemes } from '../content/es/packs'
-import { getCard, getDueCards, type CardRecord } from '../data/db'
+import { getAllCards, getCard, getDueCards, type CardRecord } from '../data/db'
 import type { CardMeta } from '../data/progress'
 import { todayLocal } from '../lib/dates'
 import { genConjugationDrill, genMatchDrill, hashSeed, mulberry32, shuffled } from './exercises'
@@ -280,8 +280,23 @@ async function buildReviewSession(): Promise<SessionSpec> {
   return { id: 'review', title: 'Review', isReview: true, exercises, hints: HINTS }
 }
 
+/** ad-hoc drill of the weakest skills, entered from the Stats screen */
+async function buildWeakSession(): Promise<SessionSpec> {
+  const today = todayLocal()
+  const cards = await getAllCards('es')
+  const weak = cards
+    .filter((c) => c.kind === 'skill' && c.srs.lapses > 0)
+    .sort((a, b) => b.srs.lapses - a.srs.lapses || a.srs.ease - b.srs.ease)
+    .slice(0, 8)
+  const exercises = weak
+    .map((c, i) => reviewExerciseFor(c, `${today}/weak/${c.id}/${i}`))
+    .filter((e): e is ExerciseInstance => !!e)
+  return { id: 'weak', title: 'Weak skills', isReview: true, exercises, hints: HINTS }
+}
+
 export async function buildSession(id: string): Promise<SessionSpec | null> {
   if (id === 'review') return buildReviewSession()
+  if (id === 'weak') return buildWeakSession()
   if (id.startsWith('topic:')) return buildTopicLesson(id.slice('topic:'.length))
   if (id.startsWith('pack:')) return buildPackSession(id.slice('pack:'.length))
   return null

@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { Route, Router, Switch, Link, useRoute } from 'wouter'
 import { useHashLocation } from 'wouter/use-hash-location'
 import { House, RotateCcw, ChartColumn, Settings as SettingsIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useSettings } from './store/settings'
 import Home from './screens/Home'
 import Review from './screens/Review'
 import Stats from './screens/Stats'
@@ -56,6 +58,11 @@ function TabShell() {
 }
 
 export default function App() {
+  const loadSettings = useSettings((s) => s.load)
+  useEffect(() => {
+    void loadSettings()
+  }, [loadSettings])
+
   return (
     <Router hook={useHashLocation}>
       <Switch>
