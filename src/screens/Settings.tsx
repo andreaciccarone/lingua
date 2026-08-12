@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Volume2 } from 'lucide-react'
 import { getVoices, isTTSSupported, speak } from '../audio/tts'
+import { exportBackup, importBackup, resetAllProgress } from '../data/backup'
 import { isStandalone } from '../lib/platform'
 import { useSettings } from '../store/settings'
 
@@ -33,6 +34,10 @@ export default function Settings() {
     return () => window.speechSynthesis?.removeEventListener('voiceschanged', collect)
   }, [])
 
+  return <SettingsView diag={diag} />
+}
+
+function SettingsView({ diag }: { diag: Diag | null }) {
   const rows: [string, string][] = diag
     ? [
         ['Installed (standalone)', diag.standalone ? 'Yes' : 'No — running in browser'],
@@ -188,7 +193,72 @@ export default function Settings() {
         ))}
       </div>
 
+      <DataSection />
+
       <p className="mt-6 text-center text-xs text-slate-400">Lingua v0.1.0</p>
     </div>
+  )
+}
+
+function DataSection() {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [message, setMessage] = useState<string | null>(null)
+
+  async function handleImport(file: File) {
+    try {
+      const result = await importBackup(await file.text())
+      setMessage(`Restored ${result.cards} cards and ${result.days} days. Reloading…`)
+      setTimeout(() => window.location.reload(), 1200)
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : 'Import failed')
+    }
+  }
+
+  async function handleReset() {
+    if (!window.confirm('Delete ALL progress on this device? Export a backup first!')) return
+    await resetAllProgress()
+    window.location.reload()
+  }
+
+  return (
+    <>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">Your data</h2>
+      <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <button
+          onClick={() => void exportBackup()}
+          className="block w-full px-4 py-3 text-left text-sm font-semibold text-indigo-600"
+        >
+          Export backup (JSON)
+        </button>
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="block w-full px-4 py-3 text-left text-sm font-semibold text-indigo-600"
+        >
+          Import backup…
+        </button>
+        <button
+          onClick={() => void handleReset()}
+          className="block w-full px-4 py-3 text-left text-sm font-semibold text-rose-600"
+        >
+          Reset all progress
+        </button>
+        {message && <p className="px-4 py-3 text-sm text-slate-500">{message}</p>}
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json,.json"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) void handleImport(f)
+          e.target.value = ''
+        }}
+      />
+      <p className="mt-2 px-1 text-xs text-slate-400">
+        Progress lives only on this device — export a backup now and then, especially before
+        deleting the app.
+      </p>
+    </>
   )
 }
