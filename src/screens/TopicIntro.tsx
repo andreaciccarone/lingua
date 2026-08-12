@@ -1,11 +1,11 @@
 import { Link, useParams } from 'wouter'
 import { ArrowLeft } from 'lucide-react'
-import { ES_TOPIC_BY_ID } from '../content/es'
+import { topicById } from '../content/registry'
 import Explanation from '../components/Explanation'
 
 export default function TopicIntro() {
   const params = useParams<{ id: string }>()
-  const topic = ES_TOPIC_BY_ID.get(params.id)
+  const topic = topicById(params.id)
 
   if (!topic) {
     return (

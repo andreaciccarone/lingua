@@ -3,18 +3,21 @@ import { Link } from 'wouter'
 import { BookA, RotateCcw, SquareStack } from 'lucide-react'
 import { getDueCards } from '../data/db'
 import { todayLocal } from '../lib/dates'
+import { useSettings } from '../store/settings'
 
 export default function Review() {
   const [counts, setCounts] = useState<{ skills: number; vocab: number } | null>(null)
+  const { activeLang, loaded } = useSettings()
 
   useEffect(() => {
-    getDueCards('es', todayLocal()).then((due) =>
+    if (!loaded) return
+    getDueCards(activeLang, todayLocal()).then((due) =>
       setCounts({
         skills: due.filter((c) => c.kind === 'skill').length,
         vocab: due.filter((c) => c.kind === 'vocab').length,
       }),
     )
-  }, [])
+  }, [activeLang, loaded])
 
   const total = (counts?.skills ?? 0) + (counts?.vocab ?? 0)
   const minutes = Math.max(1, Math.round((counts?.skills ?? 0) * 0.4 + (counts?.vocab ?? 0) * 0.15))

@@ -2,19 +2,38 @@ import type {
   DistractorStrategy,
   DrillSpec,
   ExerciseInstance,
+  Lang,
   PersonKey,
   Topic,
 } from '../content/types'
-import { ES_TOPIC_BY_ID } from '../content/es'
-import { ES_VERB_BY_ID } from '../content/es/morphology/verbs'
-import { ES_NOUN_BY_ID } from '../content/es/morphology/nouns'
-import { ES_ADJ_BY_ID } from '../content/es/morphology/adjectives'
-import { ES_LEXEME_BY_KEY, ES_PACKS, packLexemes } from '../content/es/packs'
-import { getAllCards, getCard, getDueCards, type CardRecord } from '../data/db'
+import {
+  adjById,
+  lexemeByKey,
+  nounById,
+  packById,
+  packLexemes,
+  packsFor,
+  topicById,
+  verbById,
+} from '../content/registry'
+import { getAllCards, getCard, getDueCards, getSettings, type CardRecord } from '../data/db'
 import type { CardMeta } from '../data/progress'
 import { todayLocal } from '../lib/dates'
-import { genConjugationDrill, genMatchDrill, hashSeed, mulberry32, shuffled } from './exercises'
+import {
+  genConjugationDrill,
+  genMatchDrill,
+  genWordOrder,
+  hashSeed,
+  mulberry32,
+  shuffled,
+} from './exercises'
 import { genAdjAgreeDrill, genArticleDrill, genPluralDrill } from './exercises-es'
+import {
+  genCaseArticleDrill,
+  genConjugationDrillDe,
+  genMatchDrillDe,
+  genPluralDrillDe,
+} from './exercises-de'
 import {
   genFlashcard,
   genVocabListening,
@@ -23,7 +42,6 @@ import {
   genVocabRecognition,
 } from './vocab'
 import { hasVoice } from '../audio/tts'
-import { getSettings } from '../data/db'
 
 export interface SessionSpec {
   id: string
@@ -43,83 +61,94 @@ export const HINTS: Partial<Record<DistractorStrategy, string>> = {
   infinitive: 'That is the unconjugated form. The verb must agree with its subject.',
   missingStemChange: 'This verb changes its stem vowel in this form.',
   overStemChange: 'nosotros and vosotros keep the original stem.',
-  wrongGenderArticle: 'Gender agreement: check whether the noun is el or la.',
+  wrongGenderArticle: 'Gender agreement: check the noun’s gender.',
   wrongNumber: 'Check singular vs plural.',
+  wrongCaseArticle: 'Check the case: subject nominative, direct object accusative, dem/der/dem dative.',
   serEstarSwap: 'Ser = what it is; estar = how or where it is.',
+  nichtKeinSwap: 'kein negates nouns; nicht negates everything else.',
+  missingVowelChange: 'This verb changes its vowel for du and er/sie/es.',
+  v2Violation: 'The conjugated verb must be the second element of a statement.',
   vocabConfusable: 'Careful — this word looks or sounds similar.',
-  v2Violation: 'Watch the word order.',
 }
 
 /** derive the card meta (lang/kind/source) from a skill id */
 export function metaForSkill(skillId: string): CardMeta {
+  const lang: Lang = skillId.startsWith('de') ? 'de' : 'es'
   if (skillId.includes('/vocab/')) {
     const key = skillId.split('/').pop()!.split(':')[0]
-    const pack = ES_PACKS.find((p) => p.lexemeIds.some((id) => id.split('/').pop() === key))
-    return {
-      lang: skillId.startsWith('de') ? 'de' : 'es',
-      kind: 'vocab',
-      sourceId: pack?.id ?? 'es-vocab',
-    }
+    const pack = packsFor(lang).find((p) => p.lexemeIds.some((id) => id.split('/').pop() === key))
+    return { lang, kind: 'vocab', sourceId: pack?.id ?? `${lang}-vocab` }
   }
-  return {
-    lang: skillId.startsWith('de') ? 'de' : 'es',
-    kind: 'skill',
-    sourceId: skillId.split(':')[0],
-  }
+  return { lang, kind: 'skill', sourceId: skillId.split(':')[0] }
 }
 
 // ---------- drill expansion ----------
 
 function expandDrill(spec: DrillSpec, topic: Topic, day: string, idx: number): ExerciseInstance[] {
   const seed = (j: number | string) => `${day}/${topic.id}/${idx}/${j}`
+  const de = topic.lang === 'de'
   switch (spec.gen) {
     case 'match-verb': {
-      const verb = ES_VERB_BY_ID.get(spec.verbId)
+      const verb = verbById(spec.verbId)
       if (!verb) return []
-      return [genMatchDrill({ verb, tense: spec.tense, topicId: topic.id, seed: seed(0) })]
+      return de
+        ? [genMatchDrillDe({ verb, topicId: topic.id, seed: seed(0) })]
+        : [genMatchDrill({ verb, tense: spec.tense, topicId: topic.id, seed: seed(0) })]
     }
     case 'conj': {
-      const verb = ES_VERB_BY_ID.get(spec.verbId)
+      const verb = verbById(spec.verbId)
       if (!verb) return []
       return spec.persons.map((person, j) =>
-        genConjugationDrill({
-          verb,
-          tense: spec.tense,
-          person,
-          topicId: topic.id,
-          type: spec.type,
-          seed: seed(j),
-        }),
+        de
+          ? genConjugationDrillDe({ verb, person, topicId: topic.id, type: spec.type, seed: seed(j) })
+          : genConjugationDrill({
+              verb,
+              tense: spec.tense,
+              person,
+              topicId: topic.id,
+              type: spec.type,
+              seed: seed(j),
+            }),
       )
     }
     case 'article': {
       const rand = mulberry32(hashSeed(seed('a')))
-      const nouns = shuffled(
-        spec.nounIds.map((id) => ES_NOUN_BY_ID.get(id)).filter((n) => !!n),
+      return shuffled(
+        spec.nounIds.map(nounById).filter((n) => !!n),
         rand,
-      ).slice(0, spec.count)
-      return nouns.map((noun, j) => {
-        const number = spec.number === 'mix' ? (j % 2 === 0 ? 'sg' : 'pl') : spec.number
-        const cellId = topic.id === 'es-plural-articles' && number === 'pl' ? noun.es!.gender : noun.es!.gender
-        return genArticleDrill(noun, { def: spec.def, number, topicId: topic.id, cellId, seed: seed(j) })
-      })
+      )
+        .slice(0, spec.count)
+        .map((noun, j) => {
+          const number = spec.number === 'mix' ? (j % 2 === 0 ? 'sg' : 'pl') : spec.number
+          return genArticleDrill(noun, {
+            def: spec.def,
+            number,
+            topicId: topic.id,
+            cellId: noun.es!.gender,
+            seed: seed(j),
+          })
+        })
     }
     case 'plural': {
       const rand = mulberry32(hashSeed(seed('p')))
       return shuffled(
-        spec.nounIds.map((id) => ES_NOUN_BY_ID.get(id)).filter((n) => !!n),
+        spec.nounIds.map(nounById).filter((n) => !!n),
         rand,
       )
         .slice(0, spec.count)
-        .map((noun, j) => genPluralDrill(noun, { topicId: topic.id, cellId: 'pl-form', seed: seed(j) }))
+        .map((noun, j) =>
+          de
+            ? genPluralDrillDe(noun, { topicId: topic.id, cellId: 'pl-form', seed: seed(j) })
+            : genPluralDrill(noun, { topicId: topic.id, cellId: 'pl-form', seed: seed(j) }),
+        )
     }
     case 'adj-agree': {
       const rand = mulberry32(hashSeed(seed('adj')))
       return shuffled(spec.pairs, rand)
         .slice(0, spec.count)
         .map(([adjId, nounId], j) => {
-          const adj = ES_ADJ_BY_ID.get(adjId)
-          const noun = ES_NOUN_BY_ID.get(nounId)
+          const adj = adjById(adjId)
+          const noun = nounById(nounId)
           if (!adj || !noun) return null
           return genAdjAgreeDrill(adj, noun, {
             number: j % 2 === 0 ? 'sg' : 'pl',
@@ -129,21 +158,41 @@ function expandDrill(spec: DrillSpec, topic: Topic, day: string, idx: number): E
         })
         .filter((e): e is ExerciseInstance => !!e)
     }
+    case 'case-article': {
+      const rand = mulberry32(hashSeed(seed('c')))
+      const nouns = shuffled(
+        spec.nounIds.map(nounById).filter((n) => !!n),
+        rand,
+      ).slice(0, spec.count)
+      return nouns.map((noun, j) =>
+        genCaseArticleDrill(noun, {
+          case: spec.case,
+          det: spec.det,
+          number: spec.number,
+          topicId: topic.id,
+          cellId: spec.cellId,
+          frame: spec.frames[j % spec.frames.length],
+          seed: seed(j),
+        }),
+      )
+    }
+    case 'word-order':
+      return spec.items.map((item, j) => genWordOrder(item, topic.lang, topic.id, seed(j)))
     case 'authored':
       return spec.exercises
   }
 }
 
-function lexemeByFullId(id: string) {
-  return ES_LEXEME_BY_KEY.get(id.split('/').pop()!)
+function lexemeByFullId(lang: Lang, id: string) {
+  return lexemeByKey(lang, id.split('/').pop()!)
 }
 
 export function buildTopicLesson(topicId: string): SessionSpec | null {
-  const topic = ES_TOPIC_BY_ID.get(topicId)
+  const topic = topicById(topicId)
   if (!topic) return null
   const day = todayLocal()
   const intro = topic.introLexemeIds
-    .map(lexemeByFullId)
+    .map((id) => lexemeByFullId(topic.lang, id))
     .filter((l) => !!l)
     .map((l) => genFlashcard(l))
   const drills = topic.drillItems.flatMap((spec, idx) => expandDrill(spec, topic, day, idx))
@@ -158,7 +207,7 @@ export function buildTopicLesson(topicId: string): SessionSpec | null {
 }
 
 async function buildPackSession(packId: string): Promise<SessionSpec | null> {
-  const pack = ES_PACKS.find((p) => p.id === packId)
+  const pack = packById(packId)
   if (!pack) return null
   const day = todayLocal()
   const lexemes = packLexemes(pack)
@@ -166,13 +215,13 @@ async function buildPackSession(packId: string): Promise<SessionSpec | null> {
   const fresh = []
   for (const l of lexemes) {
     const key = l.id.split('/').pop()!
-    if (!(await getCard(`es/vocab/${key}:recog`))) fresh.push(l)
+    if (!(await getCard(`${pack.lang}/vocab/${key}:recog`))) fresh.push(l)
     if (fresh.length >= 7) break
   }
   const pool = fresh.length >= 4 ? fresh : lexemes
 
   const settings = await getSettings()
-  const listening = settings.listeningEnabled && (await hasVoice('es'))
+  const listening = settings.listeningEnabled && (await hasVoice(pack.lang))
 
   const exercises: ExerciseInstance[] = [
     ...fresh.map((l) => genFlashcard(l)),
@@ -197,62 +246,81 @@ async function buildPackSession(packId: string): Promise<SessionSpec | null> {
 
 function reviewExerciseForSkill(card: CardRecord, seed: string): ExerciseInstance | null {
   const [topicId, cellId] = card.id.split(':')
-  const topic = ES_TOPIC_BY_ID.get(topicId)
+  const topic = topicById(topicId)
   if (!topic || !cellId) return null
+  const de = topic.lang === 'de'
+  const rand = mulberry32(hashSeed(seed))
 
   // conjugation person cells
   if (/^[123](sg|pl)$/.test(cellId)) {
     const conjSpec = topic.drillItems.find((d) => d.gen === 'conj')
     if (!conjSpec || conjSpec.gen !== 'conj') return null
-    const verb = ES_VERB_BY_ID.get(conjSpec.verbId)
+    const verb = verbById(conjSpec.verbId)
     if (!verb) return null
-    return genConjugationDrill({
-      verb,
-      tense: conjSpec.tense,
-      person: cellId as PersonKey,
-      topicId,
-      type: card.srs.intervalDays >= 3 ? 'cloze' : 'mc',
-      seed,
-    })
+    const type = card.srs.intervalDays >= 3 ? 'cloze' : 'mc'
+    const person = cellId as PersonKey
+    return de
+      ? genConjugationDrillDe({ verb, person, topicId, type, seed })
+      : genConjugationDrill({ verb, tense: conjSpec.tense, person, topicId, type, seed })
   }
 
   // plural formation
   if (cellId === 'pl-form') {
     const spec = topic.drillItems.find((d) => d.gen === 'plural')
     if (!spec || spec.gen !== 'plural') return null
-    const rand = mulberry32(hashSeed(seed))
-    const noun = ES_NOUN_BY_ID.get(shuffled(spec.nounIds, rand)[0])
-    return noun ? genPluralDrill(noun, { topicId, cellId, seed }) : null
+    const noun = nounById(shuffled(spec.nounIds, rand)[0])
+    if (!noun) return null
+    return de
+      ? genPluralDrillDe(noun, { topicId, cellId, seed })
+      : genPluralDrill(noun, { topicId, cellId, seed })
   }
 
-  // adjective agreement cells: m / f / m.pl / f.pl
+  // German case-article cells (spec cellId matches the card cell)
+  for (const spec of topic.drillItems) {
+    if (spec.gen !== 'case-article' || spec.cellId !== cellId) continue
+    const noun = nounById(shuffled(spec.nounIds, rand)[0])
+    if (!noun) return null
+    return genCaseArticleDrill(noun, {
+      case: spec.case,
+      det: spec.det,
+      number: spec.number,
+      topicId,
+      cellId,
+      frame: spec.frames[Math.floor(rand() * spec.frames.length)],
+      seed,
+    })
+  }
+
+  // word-order cells
+  for (const spec of topic.drillItems) {
+    if (spec.gen !== 'word-order') continue
+    const items = spec.items.filter((i) => i.cellId === cellId)
+    const item = shuffled(items, rand)[0]
+    if (item) return genWordOrder(item, topic.lang, topicId, seed)
+  }
+
+  // Spanish adjective agreement cells: m / f / m.pl / f.pl
   if (topic.drillItems.some((d) => d.gen === 'adj-agree') && /^(m|f)(\.pl)?$/.test(cellId)) {
     const gender = cellId.startsWith('m') ? 'm' : 'f'
     const number = cellId.endsWith('.pl') ? 'pl' : 'sg'
-    const rand = mulberry32(hashSeed(seed))
     for (const spec of topic.drillItems) {
       if (spec.gen !== 'adj-agree') continue
-      const candidates = spec.pairs.filter(
-        ([, nounId]) => ES_NOUN_BY_ID.get(nounId)?.es?.gender === gender,
-      )
-      const pick = shuffled(candidates, rand)[0]
-      if (pick) {
-        const adj = ES_ADJ_BY_ID.get(pick[0])
-        const noun = ES_NOUN_BY_ID.get(pick[1])
+      const candidates = spec.pairs.filter(([, nounId]) => nounById(nounId)?.es?.gender === gender)
+      const pickPair = shuffled(candidates, rand)[0]
+      if (pickPair) {
+        const adj = adjById(pickPair[0])
+        const noun = nounById(pickPair[1])
         if (adj && noun) return genAdjAgreeDrill(adj, noun, { number, topicId, seed })
       }
     }
     return null
   }
 
-  // article gender cells: m / f
+  // Spanish article gender cells: m / f
   if (/^(m|f)$/.test(cellId)) {
-    const rand = mulberry32(hashSeed(seed))
     for (const spec of shuffled(topic.drillItems, rand)) {
       if (spec.gen !== 'article') continue
-      const nouns = spec.nounIds
-        .map((id) => ES_NOUN_BY_ID.get(id))
-        .filter((n) => n?.es?.gender === cellId)
+      const nouns = spec.nounIds.map(nounById).filter((n) => n?.es?.gender === cellId)
       const noun = shuffled(nouns, rand)[0]
       if (noun) {
         const number = spec.number === 'mix' ? (rand() < 0.5 ? 'sg' : 'pl') : spec.number
@@ -265,7 +333,6 @@ function reviewExerciseForSkill(card: CardRecord, seed: string): ExerciseInstanc
   // anything else: replay an authored exercise targeting this skill
   for (const spec of topic.drillItems) {
     if (spec.gen !== 'authored') continue
-    const rand = mulberry32(hashSeed(seed))
     const match = shuffled(spec.exercises, rand).find((e) => e.skillIds.includes(card.id))
     if (match) return match
   }
@@ -275,17 +342,21 @@ function reviewExerciseForSkill(card: CardRecord, seed: string): ExerciseInstanc
 function reviewExerciseFor(card: CardRecord, seed: string): ExerciseInstance | null {
   if (card.kind === 'vocab') {
     const [path, side] = card.id.split(':')
-    const lexeme = ES_LEXEME_BY_KEY.get(path.split('/').pop()!)
+    const lang: Lang = path.startsWith('de') ? 'de' : 'es'
+    const lexeme = lexemeByKey(lang, path.split('/').pop()!)
     if (!lexeme) return null
-    const pool = ES_PACKS.flatMap((p) => packLexemes(p))
-    return side === 'prod' ? genVocabProduction(lexeme, seed) : genVocabRecognition(lexeme, pool, seed)
+    const pool = packsFor(lang).flatMap((p) => packLexemes(p))
+    return side === 'prod'
+      ? genVocabProduction(lexeme, seed)
+      : genVocabRecognition(lexeme, pool, seed)
   }
   return reviewExerciseForSkill(card, seed)
 }
 
 async function buildReviewSession(): Promise<SessionSpec> {
   const today = todayLocal()
-  const due = await getDueCards('es', today)
+  const { activeLang } = await getSettings()
+  const due = await getDueCards(activeLang, today)
   const skills = due.filter((c) => c.kind === 'skill').slice(0, REVIEW_SKILL_CAP)
   const vocab = due.filter((c) => c.kind === 'vocab').slice(0, REVIEW_VOCAB_CAP)
   const exercises = [...skills, ...vocab]
@@ -297,7 +368,8 @@ async function buildReviewSession(): Promise<SessionSpec> {
 /** ad-hoc drill of the weakest skills, entered from the Stats screen */
 async function buildWeakSession(): Promise<SessionSpec> {
   const today = todayLocal()
-  const cards = await getAllCards('es')
+  const { activeLang } = await getSettings()
+  const cards = await getAllCards(activeLang)
   const weak = cards
     .filter((c) => c.kind === 'skill' && c.srs.lapses > 0)
     .sort((a, b) => b.srs.lapses - a.srs.lapses || a.srs.ease - b.srs.ease)

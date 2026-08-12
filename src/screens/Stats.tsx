@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
 import { Flame, Snowflake } from 'lucide-react'
-import { ES_TOPIC_BY_ID, ES_UNITS } from '../content/es'
+import { topicById, unitsFor } from '../content/registry'
 import { getAllCards, getDays, type CardRecord } from '../data/db'
 import { computeStreak, daysOverdue, xpSeries, type StreakInfo } from '../data/stats'
 import { skillStrength } from '../engine/srs/scheduler'
@@ -30,7 +30,7 @@ function weakestSkills(cards: CardRecord[]): Weakest[] {
     .filter((c) => c.srs.lapses > 0)
     .map((c) => {
       const [topicId, cellId] = c.id.split(':')
-      const topic = ES_TOPIC_BY_ID.get(topicId)
+      const topic = topicById(topicId)
       const cell = topic?.skillCells.find((s) => s.cellId === cellId)
       return { cardId: c.id, label: `${topic?.title ?? topicId} · ${cell?.label ?? cellId}` }
     })
@@ -38,21 +38,26 @@ function weakestSkills(cards: CardRecord[]): Weakest[] {
 
 export default function Stats() {
   const [data, setData] = useState<StatsData | null>(null)
-  const dailyGoalXp = useSettings((s) => s.dailyGoalXp)
+  const { dailyGoalXp, activeLang, loaded } = useSettings()
 
   useEffect(() => {
+    if (!loaded) return
     async function load() {
       const today = todayLocal()
-      const [days, cards] = await Promise.all([getDays(), getAllCards('es')])
+      const [days, cards] = await Promise.all([getDays(), getAllCards(activeLang)])
       const vocab = cards.filter((c) => c.kind === 'vocab' && c.id.endsWith(':recog'))
       const strength = new Map<string, number>()
-      for (const [topicId, topic] of ES_TOPIC_BY_ID) {
-        const topicCards = cards.filter((c) => c.kind === 'skill' && c.sourceId === topicId)
-        const total = topicCards.reduce(
-          (sum, c) => sum + skillStrength(c.srs, today, daysOverdue(c.srs.due, today)),
-          0,
-        )
-        strength.set(topicId, topic.skillCells.length ? total / topic.skillCells.length : 0)
+      for (const unit of unitsFor(activeLang)) {
+        for (const topicId of unit.topicIds) {
+          const topic = topicById(topicId)
+          if (!topic) continue
+          const topicCards = cards.filter((c) => c.kind === 'skill' && c.sourceId === topicId)
+          const total = topicCards.reduce(
+            (sum, c) => sum + skillStrength(c.srs, today, daysOverdue(c.srs.due, today)),
+            0,
+          )
+          strength.set(topicId, topic.skillCells.length ? total / topic.skillCells.length : 0)
+        }
       }
       setData({
         streak: computeStreak(days, today, dailyGoalXp),
@@ -64,7 +69,7 @@ export default function Stats() {
       })
     }
     load()
-  }, [dailyGoalXp])
+  }, [dailyGoalXp, activeLang, loaded])
 
   if (!data) return <p className="pt-8 text-center text-slate-400">Loading…</p>
 
@@ -113,14 +118,14 @@ export default function Stats() {
 
       <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">Topic mastery</h2>
       <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        {ES_UNITS.map((unit) => (
+        {unitsFor(activeLang).map((unit) => (
           <div key={unit.id}>
             <p className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">
               {unit.title}
             </p>
             <div className="space-y-2">
               {unit.topicIds.map((tid) => {
-                const topic = ES_TOPIC_BY_ID.get(tid)
+                const topic = topicById(tid)
                 const strength = data.topicStrength.get(tid) ?? 0
                 if (!topic) return null
                 return (

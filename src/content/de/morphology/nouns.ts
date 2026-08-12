@@ -1,0 +1,73 @@
+import type { NounEntry } from '../../types'
+
+// Starter German nouns (M5). Gender is part of the word — always taught with the article.
+export const DE_NOUNS: NounEntry[] = [
+  { id: 'de/noun/mann', lang: 'de', lemma: 'Mann', gloss: 'man', glossPlural: 'men', tags: ['human'], de: { gender: 'm', plural: 'Männer' } },
+  { id: 'de/noun/frau', lang: 'de', lemma: 'Frau', gloss: 'woman', glossPlural: 'women', tags: ['human'], de: { gender: 'f', plural: 'Frauen' } },
+  { id: 'de/noun/kind', lang: 'de', lemma: 'Kind', gloss: 'child', glossPlural: 'children', tags: ['human', 'family'], de: { gender: 'n', plural: 'Kinder' } },
+  { id: 'de/noun/tisch', lang: 'de', lemma: 'Tisch', gloss: 'table', tags: ['object'], de: { gender: 'm', plural: 'Tische' } },
+  { id: 'de/noun/tür', lang: 'de', lemma: 'Tür', gloss: 'door', tags: ['object'], de: { gender: 'f', plural: 'Türen' } },
+  { id: 'de/noun/buch', lang: 'de', lemma: 'Buch', gloss: 'book', tags: ['object'], de: { gender: 'n', plural: 'Bücher' } },
+  { id: 'de/noun/haus', lang: 'de', lemma: 'Haus', gloss: 'house', tags: ['place'], de: { gender: 'n', plural: 'Häuser' } },
+  { id: 'de/noun/stadt', lang: 'de', lemma: 'Stadt', gloss: 'city', tags: ['place'], de: { gender: 'f', plural: 'Städte' } },
+  { id: 'de/noun/wasser', lang: 'de', lemma: 'Wasser', gloss: 'water', tags: ['drink'], de: { gender: 'n', plural: 'Wasser' } },
+  { id: 'de/noun/kaffee', lang: 'de', lemma: 'Kaffee', gloss: 'coffee', tags: ['drink'], de: { gender: 'm', plural: 'Kaffees' } },
+  { id: 'de/noun/brot', lang: 'de', lemma: 'Brot', gloss: 'bread', tags: ['food'], de: { gender: 'n', plural: 'Brote' } },
+  { id: 'de/noun/apfel', lang: 'de', lemma: 'Apfel', gloss: 'apple', tags: ['food'], de: { gender: 'm', plural: 'Äpfel' } },
+  { id: 'de/noun/student', lang: 'de', lemma: 'Student', gloss: 'student', tags: ['human', 'profession'], de: { gender: 'm', plural: 'Studenten', nDeclension: true } },
+  { id: 'de/noun/freund', lang: 'de', lemma: 'Freund', gloss: 'friend', tags: ['human'], de: { gender: 'm', plural: 'Freunde' } },
+  // family
+  { id: 'de/noun/vater', lang: 'de', lemma: 'Vater', gloss: 'father', tags: ['family', 'human'], de: { gender: 'm', plural: 'Väter' } },
+  { id: 'de/noun/mutter', lang: 'de', lemma: 'Mutter', gloss: 'mother', tags: ['family', 'human'], de: { gender: 'f', plural: 'Mütter' } },
+  { id: 'de/noun/bruder', lang: 'de', lemma: 'Bruder', gloss: 'brother', tags: ['family', 'human'], de: { gender: 'm', plural: 'Brüder' } },
+  { id: 'de/noun/schwester', lang: 'de', lemma: 'Schwester', gloss: 'sister', tags: ['family', 'human'], de: { gender: 'f', plural: 'Schwestern' } },
+  { id: 'de/noun/sohn', lang: 'de', lemma: 'Sohn', gloss: 'son', tags: ['family', 'human'], de: { gender: 'm', plural: 'Söhne' } },
+  { id: 'de/noun/tochter', lang: 'de', lemma: 'Tochter', gloss: 'daughter', tags: ['family', 'human'], de: { gender: 'f', plural: 'Töchter' } },
+  { id: 'de/noun/familie', lang: 'de', lemma: 'Familie', gloss: 'family', tags: ['family'], de: { gender: 'f', plural: 'Familien' } },
+  // people & professions
+  { id: 'de/noun/lehrer', lang: 'de', lemma: 'Lehrer', gloss: 'teacher (male)', tags: ['human', 'profession'], de: { gender: 'm', plural: 'Lehrer' } },
+  { id: 'de/noun/lehrerin', lang: 'de', lemma: 'Lehrerin', gloss: 'teacher (female)', tags: ['human', 'profession'], de: { gender: 'f', plural: 'Lehrerinnen' } },
+  { id: 'de/noun/junge', lang: 'de', lemma: 'Junge', gloss: 'boy', tags: ['human'], de: { gender: 'm', plural: 'Jungen', nDeclension: true } },
+  { id: 'de/noun/mädchen', lang: 'de', lemma: 'Mädchen', gloss: 'girl', tags: ['human'], de: { gender: 'n', plural: 'Mädchen' } },
+  { id: 'de/noun/arzt', lang: 'de', lemma: 'Arzt', gloss: 'doctor (male)', tags: ['human', 'profession'], de: { gender: 'm', plural: 'Ärzte' } },
+  { id: 'de/noun/ärztin', lang: 'de', lemma: 'Ärztin', gloss: 'doctor (female)', tags: ['human', 'profession'], de: { gender: 'f', plural: 'Ärztinnen' } },
+  // food & drink
+  { id: 'de/noun/milch', lang: 'de', lemma: 'Milch', gloss: 'milk', tags: ['drink'], de: { gender: 'f', plural: 'Milch' } },
+  { id: 'de/noun/käse', lang: 'de', lemma: 'Käse', gloss: 'cheese', tags: ['food'], de: { gender: 'm', plural: 'Käse' } },
+  { id: 'de/noun/ei', lang: 'de', lemma: 'Ei', gloss: 'egg', tags: ['food'], de: { gender: 'n', plural: 'Eier' } },
+  { id: 'de/noun/fleisch', lang: 'de', lemma: 'Fleisch', gloss: 'meat', tags: ['food'], de: { gender: 'n', plural: 'Fleisch' } },
+  { id: 'de/noun/reis', lang: 'de', lemma: 'Reis', gloss: 'rice', tags: ['food'], de: { gender: 'm', plural: 'Reis' } },
+  { id: 'de/noun/obst', lang: 'de', lemma: 'Obst', gloss: 'fruit', tags: ['food'], de: { gender: 'n', plural: 'Obst' } },
+  { id: 'de/noun/bier', lang: 'de', lemma: 'Bier', gloss: 'beer', tags: ['drink'], de: { gender: 'n', plural: 'Biere' } },
+  { id: 'de/noun/wein', lang: 'de', lemma: 'Wein', gloss: 'wine', tags: ['drink'], de: { gender: 'm', plural: 'Weine' } },
+  { id: 'de/noun/tee', lang: 'de', lemma: 'Tee', gloss: 'tea', tags: ['drink'], de: { gender: 'm', plural: 'Tees' } },
+  { id: 'de/noun/saft', lang: 'de', lemma: 'Saft', gloss: 'juice', tags: ['drink'], de: { gender: 'm', plural: 'Säfte' } },
+  // places
+  { id: 'de/noun/schule', lang: 'de', lemma: 'Schule', gloss: 'school', tags: ['place'], de: { gender: 'f', plural: 'Schulen' } },
+  { id: 'de/noun/straße', lang: 'de', lemma: 'Straße', gloss: 'street', tags: ['place'], de: { gender: 'f', plural: 'Straßen' } },
+  { id: 'de/noun/park', lang: 'de', lemma: 'Park', gloss: 'park', tags: ['place'], de: { gender: 'm', plural: 'Parks' } },
+  { id: 'de/noun/land', lang: 'de', lemma: 'Land', gloss: 'country', glossPlural: 'countries', tags: ['place'], de: { gender: 'n', plural: 'Länder' } },
+  { id: 'de/noun/dorf', lang: 'de', lemma: 'Dorf', gloss: 'village', tags: ['place'], de: { gender: 'n', plural: 'Dörfer' } },
+  { id: 'de/noun/bahnhof', lang: 'de', lemma: 'Bahnhof', gloss: 'train station', tags: ['place'], de: { gender: 'm', plural: 'Bahnhöfe' } },
+  { id: 'de/noun/supermarkt', lang: 'de', lemma: 'Supermarkt', gloss: 'supermarket', tags: ['place'], de: { gender: 'm', plural: 'Supermärkte' } },
+  { id: 'de/noun/restaurant', lang: 'de', lemma: 'Restaurant', gloss: 'restaurant', tags: ['place'], de: { gender: 'n', plural: 'Restaurants' } },
+  // everyday objects
+  { id: 'de/noun/stuhl', lang: 'de', lemma: 'Stuhl', gloss: 'chair', tags: ['object'], de: { gender: 'm', plural: 'Stühle' } },
+  { id: 'de/noun/fenster', lang: 'de', lemma: 'Fenster', gloss: 'window', tags: ['object'], de: { gender: 'n', plural: 'Fenster' } },
+  { id: 'de/noun/auto', lang: 'de', lemma: 'Auto', gloss: 'car', tags: ['vehicle'], de: { gender: 'n', plural: 'Autos' } },
+  { id: 'de/noun/telefon', lang: 'de', lemma: 'Telefon', gloss: 'telephone', tags: ['object'], de: { gender: 'n', plural: 'Telefone' } },
+  { id: 'de/noun/computer', lang: 'de', lemma: 'Computer', gloss: 'computer', tags: ['object'], de: { gender: 'm', plural: 'Computer' } },
+  { id: 'de/noun/handy', lang: 'de', lemma: 'Handy', gloss: 'mobile phone', tags: ['object'], de: { gender: 'n', plural: 'Handys' } },
+  { id: 'de/noun/tasche', lang: 'de', lemma: 'Tasche', gloss: 'bag', tags: ['object'], de: { gender: 'f', plural: 'Taschen' } },
+  { id: 'de/noun/schuh', lang: 'de', lemma: 'Schuh', gloss: 'shoe', tags: ['clothing'], de: { gender: 'm', plural: 'Schuhe' } },
+  { id: 'de/noun/zeitung', lang: 'de', lemma: 'Zeitung', gloss: 'newspaper', tags: ['object'], de: { gender: 'f', plural: 'Zeitungen' } },
+  // time & abstract
+  { id: 'de/noun/tag', lang: 'de', lemma: 'Tag', gloss: 'day', tags: ['time'], de: { gender: 'm', plural: 'Tage' } },
+  { id: 'de/noun/nacht', lang: 'de', lemma: 'Nacht', gloss: 'night', tags: ['time'], de: { gender: 'f', plural: 'Nächte' } },
+  { id: 'de/noun/woche', lang: 'de', lemma: 'Woche', gloss: 'week', tags: ['time'], de: { gender: 'f', plural: 'Wochen' } },
+  { id: 'de/noun/jahr', lang: 'de', lemma: 'Jahr', gloss: 'year', tags: ['time'], de: { gender: 'n', plural: 'Jahre' } },
+  { id: 'de/noun/zeit', lang: 'de', lemma: 'Zeit', gloss: 'time', tags: ['time'], de: { gender: 'f', plural: 'Zeiten' } },
+  { id: 'de/noun/sprache', lang: 'de', lemma: 'Sprache', gloss: 'language', tags: ['abstract'], de: { gender: 'f', plural: 'Sprachen' } },
+]
+
+export const DE_NOUN_BY_ID = new Map(DE_NOUNS.map((n) => [n.id, n]))

@@ -92,6 +92,16 @@ async function playSession(label) {
       await page.getByText(FEEDBACK).waitFor()
       continue
     }
+    // word-order tiles: place every tile (any order — wrong is fine), then Check
+    const bankTile = page.locator('main div.flex.flex-wrap.justify-center > button').first()
+    if (await visible(bankTile)) {
+      while (await visible(page.locator('main div.flex.flex-wrap.justify-center > button').first())) {
+        await page.locator('main div.flex.flex-wrap.justify-center > button').first().click()
+      }
+      await page.getByRole('button', { name: 'Check' }).click()
+      await page.getByText(FEEDBACK).waitFor()
+      continue
+    }
     await page.waitForTimeout(200)
   }
   throw new Error(`session "${label}" did not finish`)
@@ -134,6 +144,19 @@ try {
   await page.getByText('Start review').click()
   await playSession('review')
   await page.screenshot({ path: `${shotDir}/5-review-done.png` })
+
+  // 6. switch to German and play the first German topic
+  await page.locator('nav').getByText('Learn', { exact: true }).click()
+  await page.getByText('Deutsch').click()
+  await page.getByText('Erste Schritte').waitFor()
+  await page.screenshot({ path: `${shotDir}/6-german-path.png` })
+  await page.getByText('der, die, das').click()
+  await page.getByText('Start lesson').waitFor()
+  await page.getByText('Start lesson').click()
+  await page.getByText(/New word|___/).waitFor()
+  await playSession('german-gender')
+  await page.getByText('Erste Schritte').waitFor()
+  await page.screenshot({ path: `${shotDir}/7-german-done.png` })
 
   console.log('SMOKE OK')
 } catch (e) {

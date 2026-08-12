@@ -1,0 +1,107 @@
+import type { VocabPack } from '../types'
+import { DE_NOUNS } from './morphology/nouns'
+import { DE_VERBS } from './morphology/verbs'
+import type { VocabLexeme } from '../../engine/vocab'
+
+export const DE_PACKS: VocabPack[] = [
+  {
+    id: 'de-pack-basics',
+    lang: 'de',
+    unitId: 'de-u1',
+    title: 'First words',
+    lexemeIds: [
+      'de/noun/mann',
+      'de/noun/frau',
+      'de/noun/kind',
+      'de/noun/haus',
+      'de/noun/buch',
+      'de/noun/wasser',
+      'de/noun/kaffee',
+      'de/noun/brot',
+      'de/verb/machen',
+      'de/verb/wohnen',
+      'de/verb/kommen',
+      'de/verb/trinken',
+    ],
+  },
+  {
+    id: 'de-pack-family',
+    lang: 'de',
+    unitId: 'de-u1',
+    title: 'Family',
+    lexemeIds: [
+      'de/noun/familie',
+      'de/noun/vater',
+      'de/noun/mutter',
+      'de/noun/bruder',
+      'de/noun/schwester',
+      'de/noun/sohn',
+      'de/noun/tochter',
+      'de/noun/junge',
+      'de/noun/mädchen',
+      'de/noun/freund',
+    ],
+  },
+  {
+    id: 'de-pack-food',
+    lang: 'de',
+    unitId: 'de-u2',
+    title: 'Food & drink',
+    lexemeIds: [
+      'de/noun/milch',
+      'de/noun/käse',
+      'de/noun/ei',
+      'de/noun/fleisch',
+      'de/noun/reis',
+      'de/noun/obst',
+      'de/noun/bier',
+      'de/noun/wein',
+      'de/noun/tee',
+      'de/noun/saft',
+      'de/noun/apfel',
+      'de/verb/essen',
+    ],
+  },
+  {
+    id: 'de-pack-town',
+    lang: 'de',
+    unitId: 'de-u2',
+    title: 'Around town',
+    lexemeIds: [
+      'de/noun/stadt',
+      'de/noun/schule',
+      'de/noun/straße',
+      'de/noun/park',
+      'de/noun/land',
+      'de/noun/dorf',
+      'de/noun/bahnhof',
+      'de/noun/supermarkt',
+      'de/noun/restaurant',
+      'de/verb/gehen',
+    ],
+  },
+  {
+    id: 'de-pack-daily',
+    lang: 'de',
+    unitId: 'de-u2',
+    title: 'Daily life',
+    lexemeIds: [
+      'de/noun/tag',
+      'de/noun/nacht',
+      'de/noun/woche',
+      'de/noun/jahr',
+      'de/noun/zeitung',
+      'de/verb/lernen',
+      'de/verb/spielen',
+      'de/verb/kaufen',
+      'de/verb/sehen',
+      'de/verb/hören',
+      'de/verb/arbeiten',
+      'de/verb/aufstehen',
+    ],
+  },
+]
+
+export const DE_LEXEME_BY_KEY: Map<string, VocabLexeme> = new Map(
+  [...DE_NOUNS, ...DE_VERBS].map((l) => [l.id.split('/').pop()!, l]),
+)

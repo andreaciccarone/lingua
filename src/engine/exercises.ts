@@ -234,6 +234,37 @@ export function genMatchDrill(params: MatchDrillParams): ExerciseInstance {
   }
 }
 
+export interface WordOrderItem {
+  /** the canonical sentence, space-separated */
+  answer: string
+  /** other accepted orders (e.g. fronted variants) */
+  also?: string[]
+  gloss: string
+  cellId: string
+}
+
+/** word-order tiles: rebuild the sentence from shuffled words */
+export function genWordOrder(
+  item: WordOrderItem,
+  lang: 'es' | 'de',
+  topicId: string,
+  seed: string,
+): ExerciseInstance {
+  const rand = mulberry32(hashSeed(seed))
+  const tokens = item.answer.split(' ')
+  return {
+    type: 'tiles',
+    lang,
+    sentence: [],
+    gloss: item.gloss,
+    answer: item.answer,
+    accepted: item.also ?? [],
+    tiles: shuffled(tokens, rand),
+    skillIds: [`${topicId}:${item.cellId}`],
+    ttsText: item.answer,
+  }
+}
+
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }

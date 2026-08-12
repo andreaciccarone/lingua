@@ -9,6 +9,7 @@ import MultipleChoice from '../components/exercises/MultipleChoice'
 import Cloze from '../components/exercises/Cloze'
 import MatchPairs from '../components/exercises/MatchPairs'
 import Flashcard from '../components/exercises/Flashcard'
+import Tiles from '../components/exercises/Tiles'
 import SpeakButton from '../components/SpeakButton'
 
 interface Feedback {
@@ -171,6 +172,13 @@ export default function Lesson() {
           <Flashcard key={index} exercise={exercise} onComplete={handleFlashcardDone} />
         ) : exercise.type === 'match' ? (
           <MatchPairs key={index} exercise={exercise} onComplete={handleMatchComplete} />
+        ) : exercise.type === 'tiles' ? (
+          <Tiles
+            key={index}
+            exercise={exercise}
+            disabled={!!feedback}
+            onAnswer={(correct) => handleAnswer(correct)}
+          />
         ) : exercise.type === 'mc' || exercise.type === 'listen-cloze' ? (
           <div key={index}>
             {exercise.type === 'listen-cloze' && exercise.ttsText && (

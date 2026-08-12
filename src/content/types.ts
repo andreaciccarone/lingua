@@ -189,6 +189,21 @@ export type DrillSpec =
   | { gen: 'article'; nounIds: string[]; count: number; def: boolean; number: 'sg' | 'pl' | 'mix' }
   | { gen: 'plural'; nounIds: string[]; count: number }
   | { gen: 'adj-agree'; pairs: [adjId: string, nounId: string][]; count: number }
+  | {
+      gen: 'case-article'
+      nounIds: string[]
+      count: number
+      case: GermanCase
+      det: 'def' | 'indef' | 'kein'
+      number: 'sg' | 'pl'
+      /** '___' marks the article slot, '{noun}' the declined noun */
+      frames: { tokens: string[]; gloss: string }[]
+      cellId: string
+    }
+  | {
+      gen: 'word-order'
+      items: { answer: string; also?: string[]; gloss: string; cellId: string }[]
+    }
   | { gen: 'authored'; exercises: ExerciseInstance[] }
 
 /** A skill is the SRS unit: "topicId:cellId" for grammar, "lang/vocab/lemma:side" for words. */
