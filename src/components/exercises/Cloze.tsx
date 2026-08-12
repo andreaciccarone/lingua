@@ -3,6 +3,7 @@ import type { ExerciseInstance } from '../../content/types'
 import { grade } from '../../engine/grading'
 import type { GradeResult } from '../../engine/grading'
 import { useSettings } from '../../store/settings'
+import { useT } from '../../i18n/ui'
 import { Sentence } from './MultipleChoice'
 
 interface Props {
@@ -21,6 +22,7 @@ export default function Cloze({ exercise, onAnswer, disabled }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const foldDiacritics = useSettings((s) => s.foldDiacritics)
+  const t = useT()
 
   function submit() {
     if (disabled || submitted || !value.trim()) return
@@ -61,7 +63,7 @@ export default function Cloze({ exercise, onAnswer, disabled }: Props) {
           autoComplete="off"
           spellCheck={false}
           enterKeyHint="done"
-          placeholder="Type the missing word"
+          placeholder={t('typeMissingWord')}
           className="w-full rounded-2xl border-2 border-slate-200 bg-white px-4 py-4 text-center text-xl font-semibold outline-none focus:border-indigo-400"
         />
         <div className="mt-3 flex justify-center gap-2">
@@ -81,7 +83,7 @@ export default function Cloze({ exercise, onAnswer, disabled }: Props) {
             disabled={!value.trim()}
             className="mt-6 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow disabled:opacity-40"
           >
-            Check
+            {t('check')}
           </button>
         )}
       </div>

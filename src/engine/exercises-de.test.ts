@@ -13,7 +13,7 @@ describe('German conjugation drill', () => {
     const strategies = new Set<string>()
     for (let i = 0; i < 20; i++) {
       const ex = genConjugationDrillDe({
-        verb: fahren, person: '2sg', topicId: 't', type: 'mc', seed: `s${i}`,
+        verb: fahren, person: '2sg', topicId: 't', type: 'mc', seed: `s${i}`, primary: 'en',
       })
       expect(ex.answer).toBe('fährst')
       for (const o of ex.options!) if (o.strategy) strategies.add(o.strategy)
@@ -23,7 +23,7 @@ describe('German conjugation drill', () => {
 
   it('options are unique and include exactly one correct', () => {
     const ex = genConjugationDrillDe({
-      verb: fahren, person: '3sg', topicId: 't', type: 'mc', seed: 's',
+      verb: fahren, person: '3sg', topicId: 't', type: 'mc', seed: 's', primary: 'en',
     })
     const texts = ex.options!.map((o) => o.text)
     expect(new Set(texts).size).toBe(texts.length)
@@ -41,6 +41,7 @@ describe('case-article drill', () => {
       cellId: 'acc.m',
       frame: { tokens: ['Ich', 'sehe', '___', '{noun}'], gloss: 'I see the {gloss}' },
       seed: 's',
+      primary: 'en',
     })
     expect(ex.answer).toBe('den')
     expect(ex.sentence).toEqual(['Ich', 'sehe', '___', 'Mann'])
@@ -59,6 +60,7 @@ describe('case-article drill', () => {
       cellId: 'acc.m',
       frame: { tokens: ['Ich', 'sehe', '___', '{noun}'], gloss: 'I see the {gloss}' },
       seed: 's',
+      primary: 'en',
     })
     expect(ex.sentence).toContain('Studenten')
     expect(ex.answer).toBe('den')
@@ -67,7 +69,7 @@ describe('case-article drill', () => {
 
 describe('German plural drill', () => {
   it('uses the stored plural with zero typo tolerance', () => {
-    const ex = genPluralDrillDe(mann, { topicId: 't', cellId: 'pl-form', seed: 's' })
+    const ex = genPluralDrillDe(mann, { topicId: 't', cellId: 'pl-form', seed: 's', primary: 'en' })
     expect(ex.answer).toBe('Männer')
     expect(ex.strictSuffixLen).toBe('Männer'.length)
     expect(ex.sentence).toEqual(['der', 'Mann', '→', 'die', '___'])
@@ -81,6 +83,7 @@ describe('word-order generator', () => {
       'de',
       'de-word-order-v2',
       's',
+      'en',
     )
     expect([...ex.tiles!].sort()).toEqual(['Heute', 'Kaffee', 'ich', 'trinke'])
     expect(ex.accepted).toEqual(['Ich trinke heute Kaffee'])

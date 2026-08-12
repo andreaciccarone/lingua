@@ -4,6 +4,7 @@ import { getVoices, isTTSSupported, speak } from '../audio/tts'
 import { exportBackup, importBackup, resetAllProgress } from '../data/backup'
 import { isStandalone } from '../lib/platform'
 import { useSettings } from '../store/settings'
+import { useT } from '../i18n/ui'
 
 interface Diag {
   standalone: boolean
@@ -38,21 +39,23 @@ export default function Settings() {
 }
 
 function SettingsView({ diag }: { diag: Diag | null }) {
+  const tRows = useT()
   const rows: [string, string][] = diag
     ? [
-        ['Installed (standalone)', diag.standalone ? 'Yes' : 'No — running in browser'],
-        ['Offline cache (service worker)', diag.serviceWorker ? 'Active' : 'Not active yet'],
+        [tRows('installed'), diag.standalone ? tRows('yes') : tRows('installedNo')],
+        [tRows('offlineCache'), diag.serviceWorker ? tRows('active') : tRows('notActiveYet')],
         [
-          'Storage protected',
-          diag.persisted === null ? 'Unknown' : diag.persisted ? 'Yes' : 'Not yet',
+          tRows('storageProtected'),
+          diag.persisted === null ? tRows('unknown') : diag.persisted ? tRows('yes') : tRows('notYet'),
         ],
-        ['Spanish voices', String(diag.esVoices)],
-        ['German voices', String(diag.deVoices)],
+        [tRows('spanishVoices'), String(diag.esVoices)],
+        [tRows('germanVoices'), String(diag.deVoices)],
       ]
     : []
 
-  const { dailyGoalXp, foldDiacritics, ttsRate, ttsVoiceURI, listeningEnabled, update } =
+  const { dailyGoalXp, foldDiacritics, ttsRate, ttsVoiceURI, listeningEnabled, primary, update } =
     useSettings()
+  const t = useT()
   const [esVoiceList, setEsVoiceList] = useState<SpeechSynthesisVoice[]>([])
 
   useEffect(() => {
@@ -61,12 +64,32 @@ function SettingsView({ diag }: { diag: Diag | null }) {
 
   return (
     <div className="pt-4">
-      <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t('settings')}</h1>
 
-      <h2 className="mb-2 text-sm font-semibold text-slate-500">Learning</h2>
+      <h2 className="mb-2 text-sm font-semibold text-slate-500">{t('appLanguage')}</h2>
+      <div className="mb-6 flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+        {(
+          [
+            ['it', '🇮🇹 Italiano'],
+            ['en', '🇬🇧 English'],
+          ] as const
+        ).map(([lang, label]) => (
+          <button
+            key={lang}
+            onClick={() => update({ primary: lang })}
+            className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition ${
+              primary === lang ? 'bg-indigo-600 text-white shadow' : 'text-slate-500'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <h2 className="mb-2 text-sm font-semibold text-slate-500">{t('learning')}</h2>
       <div className="mb-6 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm">Daily goal</span>
+          <span className="text-sm">{t('dailyGoal')}</span>
           <div className="flex gap-1">
             {[30, 50, 80].map((g) => (
               <button
@@ -83,8 +106,8 @@ function SettingsView({ diag }: { diag: Diag | null }) {
         </div>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-sm">Forgive missing accents</p>
-            <p className="text-xs text-slate-400">habló = hablo, with a reminder</p>
+            <p className="text-sm">{t('forgiveAccents')}</p>
+            <p className="text-xs text-slate-400">{t('forgiveAccentsHint')}</p>
           </div>
           <button
             role="switch"
@@ -103,11 +126,11 @@ function SettingsView({ diag }: { diag: Diag | null }) {
         </div>
       </div>
 
-      <h2 className="mb-2 text-sm font-semibold text-slate-500">Audio</h2>
+      <h2 className="mb-2 text-sm font-semibold text-slate-500">{t('audio')}</h2>
       <div className="mb-6 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         {esVoiceList.length > 0 ? (
           <div className="flex items-center justify-between gap-3 px-4 py-3">
-            <span className="shrink-0 text-sm">Spanish voice</span>
+            <span className="shrink-0 text-sm">{t('spanishVoice')}</span>
             <div className="flex min-w-0 items-center gap-1">
               <select
                 value={ttsVoiceURI.es ?? esVoiceList[0]?.voiceURI}
@@ -132,19 +155,16 @@ function SettingsView({ diag }: { diag: Diag | null }) {
             </div>
           </div>
         ) : (
-          <p className="px-4 py-3 text-sm text-slate-400">
-            No Spanish voice installed. On iPhone: Settings → Accessibility → Spoken Content →
-            Voices.
-          </p>
+          <p className="px-4 py-3 text-sm text-slate-400">{t('noVoice')}</p>
         )}
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm">Speech speed</span>
+          <span className="text-sm">{t('speechSpeed')}</span>
           <div className="flex gap-1">
             {(
               [
-                [0.7, 'Slow'],
-                [0.9, 'Normal'],
-                [1.05, 'Fast'],
+                [0.7, t('slow')],
+                [0.9, t('normal')],
+                [1.05, t('fast')],
               ] as const
             ).map(([rate, label]) => (
               <button
@@ -163,8 +183,8 @@ function SettingsView({ diag }: { diag: Diag | null }) {
         </div>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-sm">Listening exercises</p>
-            <p className="text-xs text-slate-400">hear a word, pick what you heard</p>
+            <p className="text-sm">{t('listeningExercises')}</p>
+            <p className="text-xs text-slate-400">{t('listeningHint')}</p>
           </div>
           <button
             role="switch"
@@ -183,7 +203,7 @@ function SettingsView({ diag }: { diag: Diag | null }) {
         </div>
       </div>
 
-      <h2 className="mb-2 text-sm font-semibold text-slate-500">Device check</h2>
+      <h2 className="mb-2 text-sm font-semibold text-slate-500">{t('deviceCheck')}</h2>
       <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         {rows.map(([label, value]) => (
           <div key={label} className="flex items-center justify-between px-4 py-3">
@@ -203,44 +223,45 @@ function SettingsView({ diag }: { diag: Diag | null }) {
 function DataSection() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const t = useT()
 
   async function handleImport(file: File) {
     try {
       const result = await importBackup(await file.text())
-      setMessage(`Restored ${result.cards} cards and ${result.days} days. Reloading…`)
+      setMessage(t('restored', { cards: result.cards, days: result.days }))
       setTimeout(() => window.location.reload(), 1200)
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Import failed')
+      setMessage(e instanceof Error ? e.message : t('importFailed'))
     }
   }
 
   async function handleReset() {
-    if (!window.confirm('Delete ALL progress on this device? Export a backup first!')) return
+    if (!window.confirm(t('resetConfirm'))) return
     await resetAllProgress()
     window.location.reload()
   }
 
   return (
     <>
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">Your data</h2>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">{t('yourData')}</h2>
       <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         <button
           onClick={() => void exportBackup()}
           className="block w-full px-4 py-3 text-left text-sm font-semibold text-indigo-600"
         >
-          Export backup (JSON)
+          {t('exportBackup')}
         </button>
         <button
           onClick={() => fileRef.current?.click()}
           className="block w-full px-4 py-3 text-left text-sm font-semibold text-indigo-600"
         >
-          Import backup…
+          {t('importBackup')}
         </button>
         <button
           onClick={() => void handleReset()}
           className="block w-full px-4 py-3 text-left text-sm font-semibold text-rose-600"
         >
-          Reset all progress
+          {t('resetProgress')}
         </button>
         {message && <p className="px-4 py-3 text-sm text-slate-500">{message}</p>}
       </div>
@@ -255,10 +276,7 @@ function DataSection() {
           e.target.value = ''
         }}
       />
-      <p className="mt-2 px-1 text-xs text-slate-400">
-        Progress lives only on this device — export a backup now and then, especially before
-        deleting the app.
-      </p>
+      <p className="mt-2 px-1 text-xs text-slate-400">{t('backupHint')}</p>
     </>
   )
 }

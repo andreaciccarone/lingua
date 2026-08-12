@@ -1,18 +1,23 @@
 import { Link, useParams } from 'wouter'
 import { ArrowLeft } from 'lucide-react'
 import { topicById } from '../content/registry'
+import { loc } from '../content/types'
+import { useT } from '../i18n/ui'
+import { useSettings } from '../store/settings'
 import Explanation from '../components/Explanation'
 
 export default function TopicIntro() {
   const params = useParams<{ id: string }>()
   const topic = topicById(params.id)
+  const primary = useSettings((s) => s.primary)
+  const t = useT()
 
   if (!topic) {
     return (
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-6">
-        <p className="text-slate-500">Topic not found.</p>
+        <p className="text-slate-500">{t('topicNotFound')}</p>
         <Link href="/" className="mt-4 font-semibold text-indigo-600">
-          Back home
+          {t('backHome')}
         </Link>
       </div>
     )
@@ -25,8 +30,8 @@ export default function TopicIntro() {
           <ArrowLeft size={22} />
         </Link>
         <div>
-          <h1 className="text-xl font-bold">{topic.title}</h1>
-          <p className="text-xs text-slate-500">{topic.ruleSummary}</p>
+          <h1 className="text-xl font-bold">{loc(topic.title, primary)}</h1>
+          <p className="text-xs text-slate-500">{loc(topic.ruleSummary, primary)}</p>
         </div>
       </header>
 
@@ -40,7 +45,7 @@ export default function TopicIntro() {
             href={`/lesson/topic:${topic.id}`}
             className="block w-full rounded-2xl bg-indigo-600 py-4 text-center text-lg font-bold text-white shadow"
           >
-            Start lesson
+            {t('startLesson')}
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ExerciseInstance } from '../../content/types'
 import SpeakButton from '../SpeakButton'
+import { useT } from '../../i18n/ui'
 
 interface Props {
   exercise: ExerciseInstance
@@ -9,10 +10,11 @@ interface Props {
 
 export default function Flashcard({ exercise, onComplete }: Props) {
   const [revealed, setRevealed] = useState(false)
+  const t = useT()
 
   return (
     <div className="flex flex-col items-center pt-16">
-      <p className="text-xs font-semibold tracking-wide text-indigo-500 uppercase">New word</p>
+      <p className="text-xs font-semibold tracking-wide text-indigo-500 uppercase">{t('newWord')}</p>
       <div className="mt-6 flex items-center gap-2">
         <p className="text-4xl font-bold">{exercise.sentence[0]}</p>
         {exercise.ttsText && (
@@ -26,7 +28,7 @@ export default function Flashcard({ exercise, onComplete }: Props) {
         onClick={() => (revealed ? onComplete() : setRevealed(true))}
         className="mt-12 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow"
       >
-        {revealed ? 'Got it' : 'Reveal meaning'}
+        {revealed ? t('gotIt') : t('revealMeaning')}
       </button>
     </div>
   )

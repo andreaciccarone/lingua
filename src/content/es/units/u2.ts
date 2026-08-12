@@ -10,19 +10,25 @@ export const ES_U2_TOPICS: Topic[] = [
   {
     id: 'es-present-ar',
     lang: 'es',
-    title: '-ar verbs (present)',
-    ruleSummary: 'Drop -ar, add -o, -as, -a, -amos, -áis, -an: hablo, hablas, habla…',
+    title: { en: '-ar verbs (present)', it: 'I verbi in -ar (presente)' },
+    ruleSummary: {
+      en: 'Drop -ar, add -o, -as, -a, -amos, -áis, -an: hablo, hablas, habla…',
+      it: 'Togli -ar e aggiungi -o, -as, -a, -amos, -áis, -an: hablo, hablas, habla…',
+    },
     cefr: 'A1',
     dependencies: ['es-subject-pronouns'],
     explanation: [
       {
         kind: 'prose',
-        md: 'Most Spanish verbs end in **-ar**. To conjugate one, cut off **-ar** and add the ending for the person: *hablar* → *habl-* → *hablo* (I speak). The ending does the work of the pronoun, which is why Spanish usually drops *yo*, *tú*, etc.',
+        md: {
+          en: 'Most Spanish verbs end in **-ar**. To conjugate one, cut off **-ar** and add the ending for the person: *hablar* → *habl-* → *hablo* (I speak). The ending does the work of the pronoun, which is why Spanish usually drops *yo*, *tú*, etc.',
+          it: 'La maggior parte dei verbi spagnoli termina in **-ar**. Per coniugarne uno, togli **-ar** e aggiungi la desinenza della persona: *hablar* → *habl-* → *hablo* (io parlo). La desinenza fa il lavoro del pronome, ed è per questo che lo spagnolo di solito omette *yo*, *tú*, ecc.',
+        },
       },
       {
         kind: 'table',
-        caption: 'hablar — present tense',
-        header: ['', 'form'],
+        caption: { en: 'hablar — present tense', it: 'hablar — presente indicativo' },
+        header: ['', { en: 'form', it: 'forma' }],
         rows: [
           ['yo', 'hablo'],
           ['tú', 'hablas'],
@@ -32,22 +38,25 @@ export const ES_U2_TOPICS: Topic[] = [
           ['ellos / ellas / ustedes', 'hablan'],
         ],
       },
-      { kind: 'example', text: 'Hablo español.', gloss: 'I speak Spanish.' },
-      { kind: 'example', text: 'Trabajamos en la ciudad.', gloss: 'We work in the city.' },
-      { kind: 'example', text: 'Ella habla mucho.', gloss: 'She talks a lot.' },
+      { kind: 'example', text: 'Hablo español.', gloss: { en: 'I speak Spanish.', it: 'Parlo spagnolo.' } },
+      { kind: 'example', text: 'Trabajamos en la ciudad.', gloss: { en: 'We work in the city.', it: 'Lavoriamo in città.' } },
+      { kind: 'example', text: 'Ella habla mucho.', gloss: { en: 'She talks a lot.', it: 'Lei parla molto.' } },
       {
         kind: 'callout',
         style: 'tip',
-        md: 'One ending per person, always: *trabajar* works exactly like *hablar* — *trabajo, trabajas, trabaja…* Learn the six endings once and you can conjugate hundreds of verbs.',
+        md: {
+          en: 'One ending per person, always: *trabajar* works exactly like *hablar* — *trabajo, trabajas, trabaja…* Learn the six endings once and you can conjugate hundreds of verbs.',
+          it: 'Una desinenza per persona, sempre: *trabajar* funziona esattamente come *hablar* — *trabajo, trabajas, trabaja…* Impara le sei desinenze una volta sola e potrai coniugare centinaia di verbi.',
+        },
       },
     ],
     skillCells: [
-      { cellId: '1sg', label: 'yo form' },
-      { cellId: '2sg', label: 'tú form' },
-      { cellId: '3sg', label: 'él/ella form' },
-      { cellId: '1pl', label: 'nosotros form' },
-      { cellId: '2pl', label: 'vosotros form' },
-      { cellId: '3pl', label: 'ellos form' },
+      { cellId: '1sg', label: { en: 'yo form', it: 'forma di yo' } },
+      { cellId: '2sg', label: { en: 'tú form', it: 'forma di tú' } },
+      { cellId: '3sg', label: { en: 'él/ella form', it: 'forma di él/ella' } },
+      { cellId: '1pl', label: { en: 'nosotros form', it: 'forma di nosotros' } },
+      { cellId: '2pl', label: { en: 'vosotros form', it: 'forma di vosotros' } },
+      { cellId: '3pl', label: { en: 'ellos form', it: 'forma di ellos' } },
     ],
     introLexemeIds: ['es/verb/hablar', 'es/verb/trabajar'],
     drillItems: [
@@ -56,27 +65,42 @@ export const ES_U2_TOPICS: Topic[] = [
       { gen: 'conj', verbId: 'es/verb/trabajar', tense: 'pres', persons: ['1pl', '2pl', '3pl'], type: 'cloze' },
     ],
     errorHints: {
-      wrongPerson: 'Match the ending to the person: -o (yo), -as (tú), -a (él/ella), -amos, -áis, -an.',
-      wrongClass: 'This is an -ar verb — don’t borrow -er/-ir endings.',
-      infinitive: '“hablar” is the dictionary form — it must be conjugated here.',
+      wrongPerson: {
+        en: 'Match the ending to the person: -o (yo), -as (tú), -a (él/ella), -amos, -áis, -an.',
+        it: 'Abbina la desinenza alla persona: -o (yo), -as (tú), -a (él/ella), -amos, -áis, -an.',
+      },
+      wrongClass: {
+        en: 'This is an -ar verb — don’t borrow -er/-ir endings.',
+        it: 'Questo è un verbo in -ar — non prendere in prestito le desinenze di -er/-ir.',
+      },
+      infinitive: {
+        en: '“hablar” is the dictionary form — it must be conjugated here.',
+        it: '“hablar” è la forma del dizionario — qui va coniugato.',
+      },
     },
   },
 
   {
     id: 'es-present-er-ir',
     lang: 'es',
-    title: '-er/-ir verbs (present)',
-    ruleSummary: '-o, -es, -e, -emos/-imos, -éis/-ís, -en — er and ir differ only in nosotros & vosotros.',
+    title: { en: '-er/-ir verbs (present)', it: 'I verbi in -er/-ir (presente)' },
+    ruleSummary: {
+      en: '-o, -es, -e, -emos/-imos, -éis/-ís, -en — er and ir differ only in nosotros & vosotros.',
+      it: '-o, -es, -e, -emos/-imos, -éis/-ís, -en — -er e -ir differiscono solo in nosotros e vosotros.',
+    },
     cefr: 'A1',
     dependencies: ['es-present-ar'],
     explanation: [
       {
         kind: 'prose',
-        md: 'The other two verb families end in **-er** and **-ir**. They share almost all their endings: *-o, -es, -e, …, -en*. Only two forms differ: **nosotros** (*-emos* vs *-imos*) and **vosotros** (*-éis* vs *-ís*).',
+        md: {
+          en: 'The other two verb families end in **-er** and **-ir**. They share almost all their endings: *-o, -es, -e, …, -en*. Only two forms differ: **nosotros** (*-emos* vs *-imos*) and **vosotros** (*-éis* vs *-ís*).',
+          it: 'Le altre due famiglie di verbi terminano in **-er** e **-ir**. Condividono quasi tutte le desinenze: *-o, -es, -e, …, -en*. Solo due forme differiscono: **nosotros** (*-emos* vs *-imos*) e **vosotros** (*-éis* vs *-ís*).',
+        },
       },
       {
         kind: 'table',
-        caption: 'comer & vivir — present tense',
+        caption: { en: 'comer & vivir — present tense', it: 'comer e vivir — presente indicativo' },
         header: ['', 'comer (-er)', 'vivir (-ir)'],
         rows: [
           ['yo', 'como', 'vivo'],
@@ -93,22 +117,30 @@ export const ES_U2_TOPICS: Topic[] = [
           [4, 2],
         ],
       },
-      { kind: 'example', text: 'Como pan.', gloss: 'I eat bread.' },
-      { kind: 'example', text: 'Vivimos en la ciudad.', gloss: 'We live in the city.', note: '-ir: vivimos, not *vivemos' },
-      { kind: 'example', text: 'Bebes café.', gloss: 'You drink coffee.' },
+      { kind: 'example', text: 'Como pan.', gloss: { en: 'I eat bread.', it: 'Mangio pane.' } },
+      {
+        kind: 'example',
+        text: 'Vivimos en la ciudad.',
+        gloss: { en: 'We live in the city.', it: 'Viviamo in città.' },
+        note: { en: '-ir: vivimos, not *vivemos', it: '-ir: vivimos, non *vivemos' },
+      },
+      { kind: 'example', text: 'Bebes café.', gloss: { en: 'You drink coffee.', it: 'Bevi caffè.' } },
       {
         kind: 'callout',
         style: 'warning',
-        md: 'Don’t mix the families: -ar verbs use **a**-endings (*hablas, habla*), -er/-ir verbs use **e**-endings (*comes, come*). *Tú comas* is wrong here — that vowel belongs to -ar verbs.',
+        md: {
+          en: 'Don’t mix the families: -ar verbs use **a**-endings (*hablas, habla*), -er/-ir verbs use **e**-endings (*comes, come*). *Tú comas* is wrong here — that vowel belongs to -ar verbs.',
+          it: 'Non mescolare le famiglie: i verbi in -ar usano desinenze in **a** (*hablas, habla*), i verbi in -er/-ir desinenze in **e** (*comes, come*). *Tú comas* qui è sbagliato — quella vocale appartiene ai verbi in -ar.',
+        },
       },
     ],
     skillCells: [
-      { cellId: '1sg', label: 'yo form' },
-      { cellId: '2sg', label: 'tú form' },
-      { cellId: '3sg', label: 'él/ella form' },
-      { cellId: '1pl', label: 'nosotros form' },
-      { cellId: '2pl', label: 'vosotros form' },
-      { cellId: '3pl', label: 'ellos form' },
+      { cellId: '1sg', label: { en: 'yo form', it: 'forma di yo' } },
+      { cellId: '2sg', label: { en: 'tú form', it: 'forma di tú' } },
+      { cellId: '3sg', label: { en: 'él/ella form', it: 'forma di él/ella' } },
+      { cellId: '1pl', label: { en: 'nosotros form', it: 'forma di nosotros' } },
+      { cellId: '2pl', label: { en: 'vosotros form', it: 'forma di vosotros' } },
+      { cellId: '3pl', label: { en: 'ellos form', it: 'forma di ellos' } },
     ],
     introLexemeIds: ['es/verb/comer', 'es/verb/vivir', 'es/verb/beber'],
     drillItems: [
@@ -119,44 +151,70 @@ export const ES_U2_TOPICS: Topic[] = [
       { gen: 'conj', verbId: 'es/verb/vivir', tense: 'pres', persons: ['3sg', '2pl'], type: 'cloze' },
     ],
     errorHints: {
-      wrongPerson: 'Endings: -o, -es, -e, -emos/-imos, -éis/-ís, -en — match the subject.',
-      wrongClass: 'Careful: -ar endings (-as, -a, -amos) don’t belong on -er/-ir verbs.',
-      infinitive: 'That’s the dictionary form — it needs a person ending.',
+      wrongPerson: {
+        en: 'Endings: -o, -es, -e, -emos/-imos, -éis/-ís, -en — match the subject.',
+        it: 'Desinenze: -o, -es, -e, -emos/-imos, -éis/-ís, -en — fai concordare con il soggetto.',
+      },
+      wrongClass: {
+        en: 'Careful: -ar endings (-as, -a, -amos) don’t belong on -er/-ir verbs.',
+        it: 'Attenzione: le desinenze di -ar (-as, -a, -amos) non vanno sui verbi in -er/-ir.',
+      },
+      infinitive: {
+        en: 'That’s the dictionary form — it needs a person ending.',
+        it: 'Quella è la forma del dizionario — serve una desinenza di persona.',
+      },
     },
   },
 
   {
     id: 'es-negation',
     lang: 'es',
-    title: 'Negation',
-    ruleSummary: 'Put no directly before the conjugated verb; double negatives (no … nada) are normal.',
+    title: { en: 'Negation', it: 'La negazione' },
+    ruleSummary: {
+      en: 'Put no directly before the conjugated verb; double negatives (no … nada) are normal.',
+      it: 'Metti no subito prima del verbo coniugato; le doppie negazioni (no … nada) sono normali.',
+    },
     cefr: 'A1',
     dependencies: ['es-present-ar'],
     explanation: [
       {
         kind: 'prose',
-        md: 'To negate a sentence, put **no** directly before the conjugated verb: *Hablo* → *No hablo*. There is no Spanish “do/does” — *no* alone does the job. And unlike English, **double negatives are correct**: *No como nada* (literally “I don’t eat nothing”) means “I don’t eat anything.”',
+        md: {
+          en: 'To negate a sentence, put **no** directly before the conjugated verb: *Hablo* → *No hablo*. There is no Spanish “do/does” — *no* alone does the job. And unlike English, **double negatives are correct**: *No como nada* (literally “I don’t eat nothing”) means “I don’t eat anything.”',
+          it: 'Per negare una frase, metti **no** subito prima del verbo coniugato: *Hablo* → *No hablo*. Funziona proprio come “non” in italiano — basta *no* da solo. E come in italiano, **la doppia negazione è corretta**: *No como nada* significa “non mangio niente”.',
+        },
       },
       {
         kind: 'table',
-        caption: 'Affirmative → negative',
-        header: ['affirmative', 'negative'],
+        caption: { en: 'Affirmative → negative', it: 'Affermativa → negativa' },
+        header: [
+          { en: 'affirmative', it: 'affermativa' },
+          { en: 'negative', it: 'negativa' },
+        ],
         rows: [
           ['Hablo español.', 'No hablo español.'],
           ['Trabajamos.', 'No trabajamos.'],
           ['Como pan.', 'No como nada.'],
         ],
       },
-      { kind: 'example', text: 'No hablo francés.', gloss: 'I don’t speak French.' },
-      { kind: 'example', text: 'Ella no trabaja hoy.', gloss: 'She isn’t working today.' },
-      { kind: 'example', text: 'No como nada.', gloss: 'I don’t eat anything.', note: 'double negative — normal in Spanish' },
+      { kind: 'example', text: 'No hablo francés.', gloss: { en: 'I don’t speak French.', it: 'Non parlo francese.' } },
+      { kind: 'example', text: 'Ella no trabaja hoy.', gloss: { en: 'She isn’t working today.', it: 'Lei oggi non lavora.' } },
+      {
+        kind: 'example',
+        text: 'No como nada.',
+        gloss: { en: 'I don’t eat anything.', it: 'Non mangio niente.' },
+        note: { en: 'double negative — normal in Spanish', it: 'doppia negazione — normale in spagnolo' },
+      },
       {
         kind: 'callout',
         style: 'warning',
-        md: '*No* must sit **immediately before the verb** — nothing squeezes in between, and it never goes after: *Bebo no café* is wrong; say *No bebo café*.',
+        md: {
+          en: '*No* must sit **immediately before the verb** — nothing squeezes in between, and it never goes after: *Bebo no café* is wrong; say *No bebo café*.',
+          it: '*No* deve stare **immediatamente prima del verbo** — non ci si infila niente in mezzo, e non va mai dopo: *Bebo no café* è sbagliato; si dice *No bebo café*.',
+        },
       },
     ],
-    skillCells: [{ cellId: 'core', label: 'negation' }],
+    skillCells: [{ cellId: 'core', label: { en: 'negation', it: 'negazione' } }],
     introLexemeIds: [],
     drillItems: [
       {
@@ -167,7 +225,10 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['___'],
             gapIndex: 0,
-            gloss: '“I don’t drink coffee.” — pick the correct sentence',
+            gloss: {
+              en: '“I don’t drink coffee.” — pick the correct sentence',
+              it: '“Non bevo caffè.” — scegli la frase corretta',
+            },
             answer: 'No bebo café.',
             accepted: [],
             options: [
@@ -183,7 +244,10 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['___'],
             gapIndex: 0,
-            gloss: '“We don’t work.” — pick the correct sentence',
+            gloss: {
+              en: '“We don’t work.” — pick the correct sentence',
+              it: '“Non lavoriamo.” — scegli la frase corretta',
+            },
             answer: 'No trabajamos.',
             accepted: [],
             options: [
@@ -199,7 +263,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Yo', '___', 'hablo', 'francés.'],
             gapIndex: 1,
-            gloss: 'I don’t speak French.',
+            gloss: { en: 'I don’t speak French.', it: 'Non parlo francese.' },
             answer: 'no',
             accepted: [],
             skillIds: ['es-negation:core'],
@@ -211,7 +275,10 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['___'],
             gapIndex: 0,
-            gloss: '“She doesn’t live in the city.” — pick the correct sentence',
+            gloss: {
+              en: '“She doesn’t live in the city.” — pick the correct sentence',
+              it: '“Lei non vive in città.” — scegli la frase corretta',
+            },
             answer: 'Ella no vive en la ciudad.',
             accepted: [],
             options: [
@@ -227,7 +294,10 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['No', 'como', '___', 'por', 'la', 'mañana.'],
             gapIndex: 2,
-            gloss: 'I don’t eat anything in the morning. (no … nada)',
+            gloss: {
+              en: 'I don’t eat anything in the morning. (no … nada)',
+              it: 'Non mangio niente al mattino. (no … nada)',
+            },
             answer: 'nada',
             accepted: [],
             skillIds: ['es-negation:core'],
@@ -238,45 +308,68 @@ export const ES_U2_TOPICS: Topic[] = [
       },
     ],
     errorHints: {
-      v2Violation: 'Put “no” directly before the conjugated verb: yo no hablo.',
+      v2Violation: {
+        en: 'Put “no” directly before the conjugated verb: yo no hablo.',
+        it: 'Metti “no” subito prima del verbo coniugato: yo no hablo.',
+      },
     },
   },
 
   {
     id: 'es-questions',
     lang: 'es',
-    title: 'Questions',
-    ruleSummary: 'Rising intonation or verb–subject inversion; question words (qué, dónde…) carry accents and ¿…?',
+    title: { en: 'Questions', it: 'Le domande' },
+    ruleSummary: {
+      en: 'Rising intonation or verb–subject inversion; question words (qué, dónde…) carry accents and ¿…?',
+      it: 'Intonazione ascendente o inversione verbo–soggetto; le parole interrogative (qué, dónde…) portano l’accento e ¿…?',
+    },
     cefr: 'A1',
     dependencies: ['es-present-ar'],
     explanation: [
       {
         kind: 'prose',
-        md: 'Yes/no questions need no new grammar: keep the word order and raise your voice — *¿Hablas español?* — or invert verb and subject: *¿Trabaja ella hoy?* For open questions, start with a **question word**. All of them carry a written **accent**, and every question is flanked by **¿ … ?**',
+        md: {
+          en: 'Yes/no questions need no new grammar: keep the word order and raise your voice — *¿Hablas español?* — or invert verb and subject: *¿Trabaja ella hoy?* For open questions, start with a **question word**. All of them carry a written **accent**, and every question is flanked by **¿ … ?**',
+          it: 'Le domande sì/no non richiedono nuova grammatica: mantieni l’ordine delle parole e alza la voce — *¿Hablas español?* — oppure inverti verbo e soggetto: *¿Trabaja ella hoy?* Per le domande aperte, inizia con una **parola interrogativa**. Tutte portano l’**accento** grafico, e ogni domanda è racchiusa tra **¿ … ?**',
+        },
       },
       {
         kind: 'table',
-        caption: 'Question words',
-        header: ['Spanish', 'English'],
+        caption: { en: 'Question words', it: 'Parole interrogative' },
+        header: [
+          { en: 'Spanish', it: 'spagnolo' },
+          { en: 'English', it: 'italiano' },
+        ],
         rows: [
-          ['¿qué?', 'what?'],
-          ['¿dónde?', 'where?'],
-          ['¿quién?', 'who?'],
-          ['¿cuándo?', 'when?'],
-          ['¿cómo?', 'how?'],
-          ['¿por qué?', 'why?'],
+          ['¿qué?', { en: 'what?', it: 'che cosa?' }],
+          ['¿dónde?', { en: 'where?', it: 'dove?' }],
+          ['¿quién?', { en: 'who?', it: 'chi?' }],
+          ['¿cuándo?', { en: 'when?', it: 'quando?' }],
+          ['¿cómo?', { en: 'how?', it: 'come?' }],
+          ['¿por qué?', { en: 'why?', it: 'perché?' }],
         ],
       },
-      { kind: 'example', text: '¿Dónde vives?', gloss: 'Where do you live?' },
-      { kind: 'example', text: '¿Hablas español?', gloss: 'Do you speak Spanish?', note: 'a statement plus ¿? and rising intonation' },
-      { kind: 'example', text: '¿Por qué trabajas hoy?', gloss: 'Why are you working today?' },
+      { kind: 'example', text: '¿Dónde vives?', gloss: { en: 'Where do you live?', it: 'Dove vivi?' } },
+      {
+        kind: 'example',
+        text: '¿Hablas español?',
+        gloss: { en: 'Do you speak Spanish?', it: 'Parli spagnolo?' },
+        note: {
+          en: 'a statement plus ¿? and rising intonation',
+          it: 'un’affermazione più ¿? e intonazione ascendente',
+        },
+      },
+      { kind: 'example', text: '¿Por qué trabajas hoy?', gloss: { en: 'Why are you working today?', it: 'Perché lavori oggi?' } },
       {
         kind: 'callout',
         style: 'warning',
-        md: 'The accent is not decoration: *dónde* asks, *donde* doesn’t. And don’t drop the opening **¿** — Spanish questions open and close: *¿Cómo estás?*',
+        md: {
+          en: 'The accent is not decoration: *dónde* asks, *donde* doesn’t. And don’t drop the opening **¿** — Spanish questions open and close: *¿Cómo estás?*',
+          it: 'L’accento non è decorativo: *dónde* domanda, *donde* no. E non omettere il **¿** iniziale — le domande spagnole si aprono e si chiudono: *¿Cómo estás?*',
+        },
       },
     ],
-    skillCells: [{ cellId: 'qwords', label: 'question words' }],
+    skillCells: [{ cellId: 'qwords', label: { en: 'question words', it: 'parole interrogative' } }],
     introLexemeIds: [],
     drillItems: [
       {
@@ -286,7 +379,10 @@ export const ES_U2_TOPICS: Topic[] = [
             type: 'match',
             lang: 'es',
             sentence: [],
-            gloss: 'Match each question word with its meaning',
+            gloss: {
+              en: 'Match each question word with its meaning',
+              it: 'Abbina ogni parola interrogativa al suo significato',
+            },
             answer: '',
             accepted: [],
             pairs: [
@@ -303,7 +399,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['¿', '___', 'vives?'],
             gapIndex: 1,
-            gloss: 'Where do you live?',
+            gloss: { en: 'Where do you live?', it: 'Dove vivi?' },
             answer: 'Dónde',
             accepted: [],
             options: [
@@ -320,7 +416,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['¿', '___', 'comes?'],
             gapIndex: 1,
-            gloss: 'What do you eat?',
+            gloss: { en: 'What do you eat?', it: 'Che cosa mangi?' },
             answer: 'Qué',
             accepted: [],
             options: [
@@ -337,7 +433,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['¿', '___', 'trabajas?'],
             gapIndex: 1,
-            gloss: 'When do you work?',
+            gloss: { en: 'When do you work?', it: 'Quando lavori?' },
             answer: 'Cuándo',
             accepted: [],
             options: [
@@ -354,7 +450,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['¿', '___', 'habla', 'español?'],
             gapIndex: 1,
-            gloss: 'Who speaks Spanish?',
+            gloss: { en: 'Who speaks Spanish?', it: 'Chi parla spagnolo?' },
             answer: 'Quién',
             accepted: [],
             options: [
@@ -371,7 +467,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['¿', '___', 'trabajas', 'en', 'casa?'],
             gapIndex: 1,
-            gloss: 'Why do you work at home?',
+            gloss: { en: 'Why do you work at home?', it: 'Perché lavori a casa?' },
             answer: 'Por qué',
             accepted: [],
             options: [
@@ -387,26 +483,35 @@ export const ES_U2_TOPICS: Topic[] = [
       },
     ],
     errorHints: {
-      vocabConfusable: 'qué = what, dónde = where, quién = who, cuándo = when, cómo = how, por qué = why.',
+      vocabConfusable: {
+        en: 'qué = what, dónde = where, quién = who, cuándo = when, cómo = how, por qué = why.',
+        it: 'qué = che cosa, dónde = dove, quién = chi, cuándo = quando, cómo = come, por qué = perché.',
+      },
     },
   },
 
   {
     id: 'es-estar-present',
     lang: 'es',
-    title: 'Estar — to be (state/place)',
-    ruleSummary: 'estoy, estás, está, estamos, estáis, están — for location and temporary states.',
+    title: { en: 'Estar — to be (state/place)', it: 'Estar — essere (stato/luogo)' },
+    ruleSummary: {
+      en: 'estoy, estás, está, estamos, estáis, están — for location and temporary states.',
+      it: 'estoy, estás, está, estamos, estáis, están — per luoghi e stati temporanei.',
+    },
     cefr: 'A1',
     dependencies: ['es-ser-present'],
     explanation: [
       {
         kind: 'prose',
-        md: '**Estar** is the second “to be” — for **where** something is and **how** it is right now: location, moods, temporary states. It looks like a regular -ar verb but the *yo* form is *estoy*, and four forms carry a written accent.',
+        md: {
+          en: '**Estar** is the second “to be” — for **where** something is and **how** it is right now: location, moods, temporary states. It looks like a regular -ar verb but the *yo* form is *estoy*, and four forms carry a written accent.',
+          it: '**Estar** è il secondo “essere” — per **dove** si trova qualcosa e **come** sta in questo momento: luoghi, umori, stati temporanei. Sembra un regolare verbo in -ar, ma la forma di *yo* è *estoy*, e quattro forme portano l’accento grafico.',
+        },
       },
       {
         kind: 'table',
-        caption: 'estar — present tense',
-        header: ['', 'form'],
+        caption: { en: 'estar — present tense', it: 'estar — presente indicativo' },
+        header: ['', { en: 'form', it: 'forma' }],
         rows: [
           ['yo', 'estoy'],
           ['tú', 'estás'],
@@ -422,22 +527,25 @@ export const ES_U2_TOPICS: Topic[] = [
           [5, 1],
         ],
       },
-      { kind: 'example', text: 'Estoy en casa.', gloss: 'I am at home.' },
-      { kind: 'example', text: '¿Cómo estás?', gloss: 'How are you?' },
-      { kind: 'example', text: 'Estamos en la ciudad.', gloss: 'We are in the city.' },
+      { kind: 'example', text: 'Estoy en casa.', gloss: { en: 'I am at home.', it: 'Sono a casa.' } },
+      { kind: 'example', text: '¿Cómo estás?', gloss: { en: 'How are you?', it: 'Come stai?' } },
+      { kind: 'example', text: 'Estamos en la ciudad.', gloss: { en: 'We are in the city.', it: 'Siamo in città.' } },
       {
         kind: 'callout',
         style: 'warning',
-        md: 'The accents are part of the word: **estás, está, estáis, están** — writing *esta* instead of *está* turns “he is” into “this”. Only *estoy* and *estamos* go without one.',
+        md: {
+          en: 'The accents are part of the word: **estás, está, estáis, están** — writing *esta* instead of *está* turns “he is” into “this”. Only *estoy* and *estamos* go without one.',
+          it: 'Gli accenti fanno parte della parola: **estás, está, estáis, están** — scrivere *esta* invece di *está* trasforma “è” in “questa”. Solo *estoy* ed *estamos* ne sono privi.',
+        },
       },
     ],
     skillCells: [
-      { cellId: '1sg', label: 'yo form' },
-      { cellId: '2sg', label: 'tú form' },
-      { cellId: '3sg', label: 'él/ella form' },
-      { cellId: '1pl', label: 'nosotros form' },
-      { cellId: '2pl', label: 'vosotros form' },
-      { cellId: '3pl', label: 'ellos form' },
+      { cellId: '1sg', label: { en: 'yo form', it: 'forma di yo' } },
+      { cellId: '2sg', label: { en: 'tú form', it: 'forma di tú' } },
+      { cellId: '3sg', label: { en: 'él/ella form', it: 'forma di él/ella' } },
+      { cellId: '1pl', label: { en: 'nosotros form', it: 'forma di nosotros' } },
+      { cellId: '2pl', label: { en: 'vosotros form', it: 'forma di vosotros' } },
+      { cellId: '3pl', label: { en: 'ellos form', it: 'forma di ellos' } },
     ],
     introLexemeIds: [],
     drillItems: [
@@ -446,43 +554,85 @@ export const ES_U2_TOPICS: Topic[] = [
       { gen: 'conj', verbId: 'es/verb/estar', tense: 'pres', persons: ['1pl', '3pl'], type: 'cloze' },
     ],
     errorHints: {
-      wrongPerson: 'Estar: estoy, estás, está, estamos, estáis, están — mind the accents.',
-      infinitive: '“estar” is the dictionary form — it must be conjugated here.',
+      wrongPerson: {
+        en: 'Estar: estoy, estás, está, estamos, estáis, están — mind the accents.',
+        it: 'Estar: estoy, estás, está, estamos, estáis, están — attenzione agli accenti.',
+      },
+      infinitive: {
+        en: '“estar” is the dictionary form — it must be conjugated here.',
+        it: '“estar” è la forma del dizionario — qui va coniugato.',
+      },
     },
   },
 
   {
     id: 'es-ser-vs-estar',
     lang: 'es',
-    title: 'Ser vs estar',
-    ruleSummary: 'ser = what it is (identity, origin, profession); estar = how/where it is (state, location).',
+    title: { en: 'Ser vs estar', it: 'Ser vs estar' },
+    ruleSummary: {
+      en: 'ser = what it is (identity, origin, profession); estar = how/where it is (state, location).',
+      it: 'ser = che cosa è (identità, origine, professione); estar = come/dove sta (stato, luogo).',
+    },
     cefr: 'A1',
     dependencies: ['es-estar-present', 'es-adj-agreement'],
     explanation: [
       {
         kind: 'prose',
-        md: 'Spanish splits “to be” in two. **Ser** answers *what is it?* — identity, origin, profession, lasting traits. **Estar** answers *how is it? where is it?* — moods, temporary states, location. The adjective still agrees with the subject either way.',
+        md: {
+          en: 'Spanish splits “to be” in two. **Ser** answers *what is it?* — identity, origin, profession, lasting traits. **Estar** answers *how is it? where is it?* — moods, temporary states, location. The adjective still agrees with the subject either way.',
+          it: 'Lo spagnolo divide “essere” in due. **Ser** risponde a *che cosa è?* — identità, origine, professione, tratti stabili. **Estar** risponde a *come sta? dove sta?* — umori, stati temporanei, luoghi. In entrambi i casi l’aggettivo concorda comunque con il soggetto.',
+        },
       },
       {
         kind: 'table',
-        caption: 'Two verbs, two questions',
-        header: ['ser — what it is', 'estar — how/where it is'],
+        caption: { en: 'Two verbs, two questions', it: 'Due verbi, due domande' },
+        header: [
+          { en: 'ser — what it is', it: 'ser — che cosa è' },
+          { en: 'estar — how/where it is', it: 'estar — come/dove sta' },
+        ],
         rows: [
-          ['identity: Soy Ana.', 'state: Estoy cansado.'],
-          ['origin: Somos de la ciudad.', 'location: Estamos en casa.'],
-          ['trait: Ella es inteligente.', 'mood: Ella está contenta.'],
+          [
+            { en: 'identity: Soy Ana.', it: 'identità: Soy Ana.' },
+            { en: 'state: Estoy cansado.', it: 'stato: Estoy cansado.' },
+          ],
+          [
+            { en: 'origin: Somos de la ciudad.', it: 'origine: Somos de la ciudad.' },
+            { en: 'location: Estamos en casa.', it: 'luogo: Estamos en casa.' },
+          ],
+          [
+            { en: 'trait: Ella es inteligente.', it: 'tratto: Ella es inteligente.' },
+            { en: 'mood: Ella está contenta.', it: 'umore: Ella está contenta.' },
+          ],
         ],
       },
-      { kind: 'example', text: 'Ella es inteligente.', gloss: 'She is intelligent.', note: 'a lasting trait → ser' },
-      { kind: 'example', text: 'Ella está enferma.', gloss: 'She is sick.', note: 'a temporary state → estar' },
-      { kind: 'example', text: 'Estamos en la casa.', gloss: 'We are in the house.', note: 'location → estar' },
+      {
+        kind: 'example',
+        text: 'Ella es inteligente.',
+        gloss: { en: 'She is intelligent.', it: 'Lei è intelligente.' },
+        note: { en: 'a lasting trait → ser', it: 'un tratto stabile → ser' },
+      },
+      {
+        kind: 'example',
+        text: 'Ella está enferma.',
+        gloss: { en: 'She is sick.', it: 'Lei è malata.' },
+        note: { en: 'a temporary state → estar', it: 'uno stato temporaneo → estar' },
+      },
+      {
+        kind: 'example',
+        text: 'Estamos en la casa.',
+        gloss: { en: 'We are in the house.', it: 'Siamo in casa.' },
+        note: { en: 'location → estar', it: 'luogo → estar' },
+      },
       {
         kind: 'callout',
         style: 'tip',
-        md: 'Quick test before you speak: *what* is it? → **ser**. *How* or *where* is it? → **estar**.',
+        md: {
+          en: 'Quick test before you speak: *what* is it? → **ser**. *How* or *where* is it? → **estar**.',
+          it: 'Test rapido prima di parlare: *che cosa* è? → **ser**. *Come* o *dove* sta? → **estar**.',
+        },
       },
     ],
-    skillCells: [{ cellId: 'core', label: 'ser vs estar choice' }],
+    skillCells: [{ cellId: 'core', label: { en: 'ser vs estar choice', it: 'scelta tra ser ed estar' } }],
     introLexemeIds: ['es/adj/cansado', 'es/adj/contento', 'es/adj/enfermo', 'es/adj/feliz'],
     drillItems: [
       {
@@ -493,7 +643,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Yo', '___', 'cansado.'],
             gapIndex: 1,
-            gloss: 'I am tired.',
+            gloss: { en: 'I am tired.', it: 'Sono stanco.' },
             answer: 'estoy',
             accepted: [],
             options: [
@@ -509,7 +659,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Ella', '___', 'inteligente.'],
             gapIndex: 1,
-            gloss: 'She is intelligent.',
+            gloss: { en: 'She is intelligent.', it: 'Lei è intelligente.' },
             answer: 'es',
             accepted: [],
             options: [
@@ -525,7 +675,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Nosotros', '___', 'en', 'la', 'casa.'],
             gapIndex: 1,
-            gloss: 'We are in the house.',
+            gloss: { en: 'We are in the house.', it: 'Siamo in casa.' },
             answer: 'estamos',
             accepted: [],
             options: [
@@ -541,7 +691,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Tú', '___', 'alto.'],
             gapIndex: 1,
-            gloss: 'You are tall.',
+            gloss: { en: 'You are tall.', it: 'Sei alto.' },
             answer: 'eres',
             accepted: [],
             options: [
@@ -556,7 +706,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Ellos', '___', 'enfermos.'],
             gapIndex: 1,
-            gloss: 'They are sick.',
+            gloss: { en: 'They are sick.', it: 'Loro sono malati.' },
             answer: 'están',
             accepted: [],
             options: [
@@ -572,7 +722,7 @@ export const ES_U2_TOPICS: Topic[] = [
             lang: 'es',
             sentence: ['Mi', 'amigo', '___', 'de', 'la', 'ciudad.'],
             gapIndex: 2,
-            gloss: 'My friend is from the city.',
+            gloss: { en: 'My friend is from the city.', it: 'Il mio amico viene dalla città.' },
             answer: 'es',
             accepted: [],
             options: [
@@ -586,8 +736,14 @@ export const ES_U2_TOPICS: Topic[] = [
       },
     ],
     errorHints: {
-      serEstarSwap: 'What it is (identity, origin, trait) → ser; how or where it is (state, location) → estar.',
-      wrongPerson: 'Right verb, wrong person — match the form to the subject.',
+      serEstarSwap: {
+        en: 'What it is (identity, origin, trait) → ser; how or where it is (state, location) → estar.',
+        it: 'Che cosa è (identità, origine, tratto) → ser; come o dove sta (stato, luogo) → estar.',
+      },
+      wrongPerson: {
+        en: 'Right verb, wrong person — match the form to the subject.',
+        it: 'Verbo giusto, persona sbagliata — fai concordare la forma con il soggetto.',
+      },
     },
   },
 ]

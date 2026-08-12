@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
-import type { Lang } from '../content/types'
+import type { Lang, PrimaryLang } from '../content/types'
 import type { SrsState } from '../engine/srs/scheduler'
 
 export interface CardRecord {
@@ -26,6 +26,8 @@ export interface DayRecord {
 
 export interface Settings {
   activeLang: Lang
+  /** instruction language for UI, explanations and glosses */
+  primary: PrimaryLang
   dailyGoalXp: number
   foldDiacritics: boolean
   ttsRate: number
@@ -35,6 +37,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   activeLang: 'es',
+  primary: 'it',
   dailyGoalXp: 50,
   foldDiacritics: false,
   ttsRate: 0.9,

@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import type { ExerciseOption } from '../content/types'
 import type { GradeResult } from '../engine/grading'
 import { buildSession, metaForSkill, type SessionSpec } from '../engine/session'
+import { useT } from '../i18n/ui'
 import { finishSession, recordAnswer } from '../data/progress'
 import MultipleChoice from '../components/exercises/MultipleChoice'
 import Cloze from '../components/exercises/Cloze'
@@ -20,6 +21,7 @@ interface Feedback {
 export default function Lesson() {
   const params = useParams<{ id: string }>()
   const [, navigate] = useLocation()
+  const t = useT()
   const [spec, setSpec] = useState<SessionSpec | null>(null)
   const [missing, setMissing] = useState(false)
   const [index, setIndex] = useState(0)
@@ -64,11 +66,11 @@ export default function Lesson() {
       setFirstTryCorrect((n) => n + 1)
       const note =
         gradeResult?.note === 'typo'
-          ? 'Small typo — counted as correct.'
+          ? t('smallTypo')
           : gradeResult?.note === 'accent'
-            ? `Watch the accent: ${exercise.answer}`
+            ? `${t('watchAccent')} ${exercise.answer}`
             : gradeResult?.note === 'caps'
-              ? 'German nouns are capitalized.'
+              ? t('germanCaps')
               : undefined
       setFeedback({ correct: true, message: note })
     } else {
@@ -89,7 +91,7 @@ export default function Lesson() {
     if (wrongTaps === 0) setFirstTryCorrect((n) => n + 1)
     setFeedback({
       correct: wrongTaps === 0,
-      message: wrongTaps ? 'Cleared with some misses.' : undefined,
+      message: wrongTaps ? t('clearedWithMisses') : undefined,
     })
   }
 
@@ -117,16 +119,14 @@ export default function Lesson() {
 
   if (missing) {
     return (
-      <Empty
-        title="Nothing here"
-        body="This session is empty — nothing is due right now."
-        onDone={() => navigate('/')}
-      />
+      <Empty title={t('nothingHere')} body={t('emptySession')} onDone={() => navigate('/')} />
     )
   }
 
   if (!spec || !exercise || (finishing && earnedXp === null)) {
-    return <div className="flex min-h-dvh items-center justify-center text-slate-400">Loading…</div>
+    return (
+      <div className="flex min-h-dvh items-center justify-center text-slate-400">{t('loading')}</div>
+    )
   }
 
   if (earnedXp !== null) {
@@ -135,17 +135,17 @@ export default function Lesson() {
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-6 pt-safe pb-safe">
         <p className="text-6xl">{pct >= 80 ? '🎉' : pct >= 50 ? '💪' : '📖'}</p>
         <h1 className="mt-4 text-2xl font-bold">
-          {spec.isReview ? 'Review complete' : 'Lesson complete'}
+          {spec.isReview ? t('reviewComplete') : t('lessonComplete')}
         </h1>
         <p className="mt-2 text-slate-500">
-          {firstTryCorrect} of {spec.exercises.length} right on the first try ({pct}%)
+          {t('firstTryScore', { n: firstTryCorrect, total: spec.exercises.length, pct })}
         </p>
         <p className="mt-1 font-semibold text-amber-600">+{earnedXp} XP</p>
         <button
           onClick={() => navigate('/')}
           className="mt-8 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow"
         >
-          Continue
+          {t('continue')}
         </button>
       </div>
     )
@@ -211,7 +211,7 @@ export default function Lesson() {
           <div className="mx-auto max-w-lg px-4 py-4">
             <div className="flex items-center justify-between">
               <p className={`font-bold ${feedback.correct ? 'text-emerald-800' : 'text-rose-800'}`}>
-                {feedback.correct ? 'Correct!' : 'Not quite.'}
+                {feedback.correct ? t('correct') : t('notQuite')}
               </p>
               {exercise.ttsText && exercise.type !== 'listen-cloze' && (
                 <SpeakButton text={exercise.ttsText} lang={exercise.lang} size={18} autoPlay />
@@ -230,7 +230,7 @@ export default function Lesson() {
                 feedback.correct ? 'bg-emerald-600' : 'bg-rose-600'
               }`}
             >
-              Continue
+              {t('continue')}
             </button>
           </div>
         </div>
@@ -248,7 +248,7 @@ function Empty({ title, body, onDone }: { title: string; body: string; onDone: (
         onClick={onDone}
         className="mt-8 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow"
       >
-        Back
+        ←
       </button>
     </div>
   )

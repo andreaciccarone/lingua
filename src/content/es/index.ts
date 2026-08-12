@@ -7,7 +7,7 @@ export const ES_UNITS: Unit[] = [
     id: 'es-u1',
     lang: 'es',
     title: 'Primeros pasos',
-    blurb: 'Nouns, articles and being',
+    blurb: { en: 'Nouns, articles and being', it: 'Nomi, articoli ed essere' },
     topicIds: [
       'es-noun-gender',
       'es-plural-articles',
@@ -21,7 +21,7 @@ export const ES_UNITS: Unit[] = [
     id: 'es-u2',
     lang: 'es',
     title: 'El presente',
-    blurb: 'Regular verbs and everyday sentences',
+    blurb: { en: 'Regular verbs and everyday sentences', it: 'Verbi regolari e frasi quotidiane' },
     topicIds: [
       'es-present-ar',
       'es-present-er-ir',
@@ -36,3 +36,11 @@ export const ES_UNITS: Unit[] = [
 
 export const ES_TOPICS: Topic[] = [...ES_U1_TOPICS, ...ES_U2_TOPICS]
 export const ES_TOPIC_BY_ID = new Map(ES_TOPICS.map((t) => [t.id, t]))
+
+/** designed but not yet authored — shown greyed-out on the path */
+export const ES_UPCOMING_UNITS: { title: string; blurb: { en: string; it: string } }[] = [
+  { title: 'Verbos con carácter', blurb: { en: 'Irregulars and stem-changers', it: 'Verbi irregolari e con dittongazione' } },
+  { title: 'La gente y las cosas', blurb: { en: 'Possessives, object pronouns, gustar', it: 'Possessivi, pronomi oggetto, gustar' } },
+  { title: 'Mi día', blurb: { en: 'Reflexives, routines and comparisons', it: 'Riflessivi, routine e comparativi' } },
+  { title: 'Ayer', blurb: { en: 'The past tense', it: 'Il passato' } },
+]

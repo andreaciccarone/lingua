@@ -2,11 +2,15 @@ import type {
   DistractorStrategy,
   ExerciseInstance,
   GermanCase,
+  LocText,
   NounEntry,
   PersonKey,
+  PrimaryLang,
   VerbEntry,
 } from '../content/types'
-import { PERSONS } from '../content/types'
+import { loc, PERSONS } from '../content/types'
+import { glossNounBare, glossVerb } from '../i18n/gloss-it'
+import { tFor } from '../i18n/ui'
 import { conjugateDe } from './conjugator/de'
 import { declineDe, type DeNumber } from './declension/de'
 import { hashSeed, mulberry32, pick, pickDistractors, shuffled } from './exercises'
@@ -18,30 +22,6 @@ const DE_PRONOUNS: Record<PersonKey, string[]> = {
   '1pl': ['wir'],
   '2pl': ['ihr'],
   '3pl': ['sie'],
-}
-
-const DE_PRONOUN_GLOSS: Record<PersonKey, string> = {
-  '1sg': 'I',
-  '2sg': 'you',
-  '3sg': 'he/she/it',
-  '1pl': 'we',
-  '2pl': 'you all',
-  '3pl': 'they',
-}
-
-const BE_FORMS: Record<PersonKey, string> = {
-  '1sg': 'am',
-  '2sg': 'are',
-  '3sg': 'is',
-  '1pl': 'are',
-  '2pl': 'are',
-  '3pl': 'are',
-}
-
-function englishGlossDe(verb: VerbEntry, person: PersonKey): string {
-  const base = verb.gloss.replace(/^to /, '').replace(/\s*\(.*\)$/, '')
-  const form = base === 'be' ? BE_FORMS[person] : person === '3sg' ? verb.gloss3sg : base
-  return `${DE_PRONOUN_GLOSS[person]} ${form}`
 }
 
 interface Candidate {
@@ -74,8 +54,9 @@ export function genConjugationDrillDe(params: {
   topicId: string
   type: 'mc' | 'cloze'
   seed: string
+  primary: PrimaryLang
 }): ExerciseInstance {
-  const { verb, person, topicId, type, seed } = params
+  const { verb, person, topicId, type, seed, primary } = params
   const rand = mulberry32(hashSeed(seed))
   const pronoun = pick(DE_PRONOUNS[person], rand)
   const { form } = conjugateDe(verb, 'pres', person)
@@ -85,7 +66,7 @@ export function genConjugationDrillDe(params: {
     lang: 'de',
     sentence: [capitalize(pronoun), '___', `(${verb.lemma})`],
     gapIndex: 1,
-    gloss: englishGlossDe(verb, person),
+    gloss: glossVerb(verb, person, primary),
     answer: form,
     accepted: [],
     skillIds: [`${topicId}:${person}`],
@@ -112,11 +93,12 @@ export function genCaseArticleDrill(
     topicId: string
     cellId: string
     /** sentence frame around the gap; token '___' marks the article slot, '{noun}' the noun */
-    frame: { tokens: string[]; gloss: string }
+    frame: { tokens: string[]; gloss: LocText }
     seed: string
+    primary: PrimaryLang
   },
 ): ExerciseInstance {
-  const { topicId, cellId, frame, seed } = opts
+  const { topicId, cellId, frame, seed, primary } = opts
   const rand = mulberry32(hashSeed(seed))
   const { article, noun: nounForm } = declineDe(noun, {
     case: opts.case,
@@ -149,7 +131,7 @@ export function genCaseArticleDrill(
     lang: 'de',
     sentence,
     gapIndex,
-    gloss: frame.gloss.replace('{gloss}', noun.gloss),
+    gloss: loc(frame.gloss, primary).replace('{gloss}', glossNounBare(noun, primary)),
     answer: article,
     accepted: [],
     options: shuffled([{ text: article }, ...pickDistractors(candidates, article, 3, rand)], rand),
@@ -163,8 +145,9 @@ export function genMatchDrillDe(params: {
   verb: VerbEntry
   topicId: string
   seed: string
+  primary: PrimaryLang
 }): ExerciseInstance {
-  const { verb, topicId, seed } = params
+  const { verb, topicId, seed, primary } = params
   const rand = mulberry32(hashSeed(seed))
   const forms = Object.fromEntries(
     PERSONS.map((p) => [p, conjugateDe(verb, 'pres', p).form]),
@@ -176,7 +159,7 @@ export function genMatchDrillDe(params: {
     type: 'match',
     lang: 'de',
     sentence: [],
-    gloss: `Match each pronoun with the right form of “${verb.lemma}”`,
+    gloss: tFor(primary)('matchPronounForm', { verb: verb.lemma }),
     answer: '',
     accepted: [],
     pairs: persons.map((p) => [DE_PRONOUNS[p][0], forms[p]]),
@@ -187,7 +170,7 @@ export function genMatchDrillDe(params: {
 /** plural production: "der Tisch → die ___" (stored plurals, no typo tolerance) */
 export function genPluralDrillDe(
   noun: NounEntry,
-  opts: { topicId: string; cellId: string; seed: string },
+  opts: { topicId: string; cellId: string; seed: string; primary: PrimaryLang },
 ): ExerciseInstance {
   void opts.seed
   const sg = declineDe(noun, { case: 'nom', det: 'def', number: 'sg' })
@@ -197,7 +180,7 @@ export function genPluralDrillDe(
     lang: 'de',
     sentence: [sg.article, sg.noun, '→', 'die', '___'],
     gapIndex: 4,
-    gloss: `plural of “${noun.lemma}”`,
+    gloss: tFor(opts.primary)('pluralOf', { noun: noun.lemma }),
     answer: plural,
     accepted: [],
     skillIds: [`${opts.topicId}:${opts.cellId}`],

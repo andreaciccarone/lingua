@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
 import { BookA, Check, Flame, Lock } from 'lucide-react'
 import type { Lang } from '../content/types'
-import { packsFor, topicById, unitsFor } from '../content/registry'
+import { loc } from '../content/types'
+import { packsFor, topicById, unitsFor, upcomingUnitsFor } from '../content/registry'
+import { useT } from '../i18n/ui'
 import { getAllLessons, getDays } from '../data/db'
 import { computeStreak, xpOn } from '../data/stats'
 import { todayLocal } from '../lib/dates'
 import { useSettings } from '../store/settings'
 
 export default function Home() {
-  const { activeLang, dailyGoalXp, loaded, update } = useSettings()
+  const { activeLang, dailyGoalXp, loaded, primary, update } = useSettings()
+  const t = useT()
   const [completed, setCompleted] = useState<Set<string>>(new Set())
   const [streak, setStreak] = useState(0)
   const [todayXp, setTodayXp] = useState(0)
@@ -70,9 +73,9 @@ export default function Home() {
         {unitsFor(lang).map((unit, ui) => (
           <section key={unit.id}>
             <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
-              Unit {ui + 1} · {unit.title}
+              {t('unit')} {ui + 1} · {unit.title}
             </p>
-            <p className="mb-3 text-sm text-slate-500">{unit.blurb}</p>
+            <p className="mb-3 text-sm text-slate-500">{loc(unit.blurb, primary)}</p>
             <ol className="space-y-2">
               {unit.topicIds.map((tid) => {
                 const topic = topicById(tid)
@@ -95,15 +98,17 @@ export default function Home() {
                           unlocked || done ? 'text-slate-900' : 'text-slate-400'
                         }`}
                       >
-                        {topic.title}
+                        {loc(topic.title, primary)}
                       </p>
-                      <p className="truncate text-xs text-slate-400">{topic.ruleSummary}</p>
+                      <p className="truncate text-xs text-slate-400">
+                        {loc(topic.ruleSummary, primary)}
+                      </p>
                     </div>
                     {done ? (
                       <Check size={18} className="shrink-0 text-emerald-500" />
                     ) : unlocked ? (
                       <span className="shrink-0 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
-                        Learn
+                        {t('learnBtn')}
                       </span>
                     ) : (
                       <Lock size={16} className="shrink-0 text-slate-300" />
@@ -132,15 +137,15 @@ export default function Home() {
                       <div className="flex items-center gap-2">
                         <BookA size={16} className="text-emerald-500" />
                         <div>
-                          <p className="text-xs font-medium text-emerald-500">Word pack</p>
-                          <p className="font-semibold">{pack.title}</p>
+                          <p className="text-xs font-medium text-emerald-500">{t('wordPack')}</p>
+                          <p className="font-semibold">{loc(pack.title, primary)}</p>
                         </div>
                       </div>
                       {done ? (
                         <Check size={18} className="text-emerald-500" />
                       ) : (
                         <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
-                          Words
+                          {t('words')}
                         </span>
                       )}
                     </li>
@@ -148,6 +153,19 @@ export default function Home() {
                 )
               })}
             </ol>
+          </section>
+        ))}
+
+        {upcomingUnitsFor(lang).map((unit, i) => (
+          <section key={unit.title}>
+            <p className="text-xs font-semibold tracking-wide text-slate-300 uppercase">
+              {t('unit')} {unitsFor(lang).length + i + 1} · {unit.title}
+            </p>
+            <p className="mb-3 text-sm text-slate-400">{loc(unit.blurb, primary)}</p>
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-100 p-4">
+              <span className="text-sm font-semibold text-slate-400">{t('comingSoon')}</span>
+              <Lock size={16} className="text-slate-300" />
+            </div>
           </section>
         ))}
       </div>

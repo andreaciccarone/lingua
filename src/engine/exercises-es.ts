@@ -1,5 +1,7 @@
-import type { AdjEntry, ExerciseInstance, NounEntry } from '../content/types'
+import type { AdjEntry, ExerciseInstance, NounEntry, PrimaryLang } from '../content/types'
 import { adjAgreeEs, articleEs, pluralEs, type EsNumber } from './morph/es'
+import { glossAdjNoun, glossNoun } from '../i18n/gloss-it'
+import { tFor } from '../i18n/ui'
 import { hashSeed, mulberry32, pickDistractors, shuffled } from './exercises'
 
 function nounForm(noun: NounEntry, number: EsNumber): string {
@@ -9,9 +11,16 @@ function nounForm(noun: NounEntry, number: EsNumber): string {
 /** article pick: "___ casa" → la. Distractors are wrong-gender / wrong-number articles. */
 export function genArticleDrill(
   noun: NounEntry,
-  opts: { def: boolean; number: EsNumber; topicId: string; cellId: string; seed: string },
+  opts: {
+    def: boolean
+    number: EsNumber
+    topicId: string
+    cellId: string
+    seed: string
+    primary: PrimaryLang
+  },
 ): ExerciseInstance {
-  const { def, number, topicId, cellId, seed } = opts
+  const { def, number, topicId, cellId, seed, primary } = opts
   const rand = mulberry32(hashSeed(seed))
   const es = noun.es!
   const answer = articleEs(noun, def, number)
@@ -30,7 +39,7 @@ export function genArticleDrill(
     lang: 'es',
     sentence: ['___', nounForm(noun, number)],
     gapIndex: 0,
-    gloss: `${def ? 'the' : number === 'sg' ? 'a' : 'some'} ${number === 'sg' ? noun.gloss : (noun.glossPlural ?? noun.gloss + 's')}`,
+    gloss: glossNoun(noun, { def, number }, primary),
     answer,
     accepted: [],
     options: shuffled([{ text: answer }, ...pickDistractors(candidates, answer, 3, rand)], rand),
@@ -42,7 +51,7 @@ export function genArticleDrill(
 /** plural production: "la casa → las ___" (typed) */
 export function genPluralDrill(
   noun: NounEntry,
-  opts: { topicId: string; cellId: string; seed: string },
+  opts: { topicId: string; cellId: string; seed: string; primary: PrimaryLang },
 ): ExerciseInstance {
   void opts.seed
   const plural = pluralEs(noun)
@@ -51,7 +60,7 @@ export function genPluralDrill(
     lang: 'es',
     sentence: [articleEs(noun, true, 'sg'), noun.lemma, '→', articleEs(noun, true, 'pl'), '___'],
     gapIndex: 4,
-    gloss: `plural of “${noun.lemma}”`,
+    gloss: tFor(opts.primary)('pluralOf', { noun: noun.lemma }),
     answer: plural,
     accepted: [],
     skillIds: [`${opts.topicId}:${opts.cellId}`],
@@ -65,9 +74,9 @@ export function genPluralDrill(
 export function genAdjAgreeDrill(
   adj: AdjEntry,
   noun: NounEntry,
-  opts: { number: EsNumber; topicId: string; seed: string },
+  opts: { number: EsNumber; topicId: string; seed: string; primary: PrimaryLang },
 ): ExerciseInstance {
-  const { number, topicId, seed } = opts
+  const { number, topicId, seed, primary } = opts
   const rand = mulberry32(hashSeed(seed))
   const gender = noun.es!.gender
   const answer = adjAgreeEs(adj, gender, number)
@@ -91,7 +100,7 @@ export function genAdjAgreeDrill(
     lang: 'es',
     sentence: [articleEs(noun, true, number), nounForm(noun, number), '___'],
     gapIndex: 2,
-    gloss: `the ${adj.gloss} ${number === 'sg' ? noun.gloss : (noun.glossPlural ?? noun.gloss + 's')}`,
+    gloss: glossAdjNoun(adj, noun, number, primary),
     answer,
     accepted: [],
     options: shuffled([{ text: answer }, ...pickDistractors(candidates, answer, 3, rand)], rand),

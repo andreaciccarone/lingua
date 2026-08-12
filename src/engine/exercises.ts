@@ -2,13 +2,17 @@ import type {
   DistractorStrategy,
   ExerciseInstance,
   ExerciseOption,
+  LocText,
   PersonKey,
+  PrimaryLang,
   SpanishVerbClass,
   TenseKey,
   VerbEntry,
 } from '../content/types'
-import { PERSONS } from '../content/types'
+import { loc, PERSONS } from '../content/types'
 import { conjugateEs, ES_ENDINGS, paradigmEs } from './conjugator/es'
+import { glossVerb } from '../i18n/gloss-it'
+import { tFor } from '../i18n/ui'
 
 // ---------- seeded RNG: sessions are reproducible given (date, skill) ----------
 
@@ -54,31 +58,6 @@ const PRONOUNS: Record<PersonKey, string[]> = {
   '1pl': ['nosotros', 'nosotras'],
   '2pl': ['vosotros', 'vosotras'],
   '3pl': ['ellos', 'ellas'],
-}
-
-const PRONOUN_GLOSS: Record<PersonKey, string> = {
-  '1sg': 'I',
-  '2sg': 'you',
-  '3sg': 'he/she',
-  '1pl': 'we',
-  '2pl': 'you all',
-  '3pl': 'they',
-}
-
-const BE_FORMS: Record<PersonKey, string> = {
-  '1sg': 'am',
-  '2sg': 'are',
-  '3sg': 'is',
-  '1pl': 'are',
-  '2pl': 'are',
-  '3pl': 'are',
-}
-
-/** "to be (identity)" + 2sg -> "you are"; "to speak" + 3sg -> "he/she speaks" */
-function englishGloss(verb: VerbEntry, person: PersonKey): string {
-  const base = verb.gloss.replace(/^to /, '').replace(/\s*\(.*\)$/, '')
-  const form = base === 'be' ? BE_FORMS[person] : person === '3sg' ? verb.gloss3sg : base
-  return `${PRONOUN_GLOSS[person]} ${form}`
 }
 
 // ---------- diagnostic distractors for conjugation ----------
@@ -165,10 +144,11 @@ export interface ConjugationDrillParams {
   topicId: string
   type: 'mc' | 'cloze'
   seed: string
+  primary: PrimaryLang
 }
 
 export function genConjugationDrill(params: ConjugationDrillParams): ExerciseInstance {
-  const { verb, tense, person, topicId, type, seed } = params
+  const { verb, tense, person, topicId, type, seed, primary } = params
   const rand = mulberry32(hashSeed(seed))
   const pronoun = pick(PRONOUNS[person], rand)
   const { form } = conjugateEs(verb, tense, person)
@@ -177,7 +157,7 @@ export function genConjugationDrill(params: ConjugationDrillParams): ExerciseIns
   ]
 
   const sentence = [capitalize(pronoun), '___', `(${verb.lemma})`]
-  const gloss = englishGloss(verb, person)
+  const gloss = glossVerb(verb, person, primary)
 
   const base: ExerciseInstance = {
     type,
@@ -210,11 +190,12 @@ export interface MatchDrillParams {
   topicId: string
   persons?: PersonKey[]
   seed: string
+  primary: PrimaryLang
 }
 
 /** Pronoun ↔ conjugated-form matching, the paradigm warmup. */
 export function genMatchDrill(params: MatchDrillParams): ExerciseInstance {
-  const { verb, tense, topicId, seed } = params
+  const { verb, tense, topicId, seed, primary } = params
   const rand = mulberry32(hashSeed(seed))
   const paradigm = paradigmEs(verb, tense)
   // avoid ambiguous pairs: skip persons whose form duplicates another's
@@ -226,7 +207,7 @@ export function genMatchDrill(params: MatchDrillParams): ExerciseInstance {
     type: 'match',
     lang: 'es',
     sentence: [],
-    gloss: `Match each pronoun with the right form of “${verb.lemma}”`,
+    gloss: tFor(primary)('matchPronounForm', { verb: verb.lemma }),
     answer: '',
     accepted: [],
     pairs,
@@ -239,7 +220,7 @@ export interface WordOrderItem {
   answer: string
   /** other accepted orders (e.g. fronted variants) */
   also?: string[]
-  gloss: string
+  gloss: LocText
   cellId: string
 }
 
@@ -249,6 +230,7 @@ export function genWordOrder(
   lang: 'es' | 'de',
   topicId: string,
   seed: string,
+  primary: PrimaryLang,
 ): ExerciseInstance {
   const rand = mulberry32(hashSeed(seed))
   const tokens = item.answer.split(' ')
@@ -256,7 +238,7 @@ export function genWordOrder(
     type: 'tiles',
     lang,
     sentence: [],
-    gloss: item.gloss,
+    gloss: loc(item.gloss, primary),
     answer: item.answer,
     accepted: item.also ?? [],
     tiles: shuffled(tokens, rand),

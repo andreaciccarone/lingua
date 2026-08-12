@@ -4,6 +4,17 @@
 export type Lang = 'es' | 'de'
 export type Cefr = 'A1' | 'A2'
 
+/** the user's instruction language (what explanations/glosses are shown in) */
+export type PrimaryLang = 'en' | 'it'
+
+/** localizable text: a bare string is English (fallback), or per-language variants */
+export type LocText = string | { en: string; it: string }
+
+export function loc(text: LocText, primary: PrimaryLang): string {
+  if (typeof text === 'string') return text
+  return text[primary] ?? text.en
+}
+
 export type PersonKey = '1sg' | '2sg' | '3sg' | '1pl' | '2pl' | '3pl'
 export const PERSONS: PersonKey[] = ['1sg', '2sg', '3sg', '1pl', '2pl', '3pl']
 
@@ -43,6 +54,8 @@ export interface VerbEntry {
   lang: Lang
   lemma: string
   gloss: string // "to speak"
+  /** Italian gloss: infinitive ("parlare") */
+  glossIt?: string
   gloss3sg: string // "speaks"
   tags: SemTag[]
   /** semantic tags of plausible direct objects ("comer" -> food) */
@@ -73,6 +86,9 @@ export interface NounEntry {
   lemma: string
   gloss: string
   glossPlural?: string
+  /** Italian gloss WITH definite article ("la casa") + plural ("le case") */
+  glossIt?: string
+  glossItPl?: string
   tags: SemTag[]
   /** singularArticle: feminine nouns with stressed initial /a/ take "el" (el agua) */
   es?: { gender: 'm' | 'f'; pluralIrregular?: string; singularArticle?: 'el' | 'la' }
@@ -84,6 +100,8 @@ export interface AdjEntry {
   lang: Lang
   lemma: string
   gloss: string
+  /** Italian gloss forms ("bianco/bianca/bianchi/bianche") */
+  glossItForms?: { m: string; f: string; mpl: string; fpl: string }
   /** which noun tags it can plausibly describe */
   tags: SemTag[]
   es?: {
@@ -101,34 +119,34 @@ export interface Unit {
   id: string // "es-u1"
   lang: Lang
   title: string
-  blurb: string
+  blurb: LocText
   topicIds: string[] // ordered
   packIds: string[] // vocab packs belonging to this unit
 }
 
 export type ExplanationBlock =
-  | { kind: 'prose'; md: string }
+  | { kind: 'prose'; md: LocText }
   | {
       kind: 'table'
-      caption: string
-      header: string[]
-      rows: string[][]
+      caption: LocText
+      header: LocText[]
+      rows: LocText[][]
       /** [row, col] cells to visually highlight */
       highlight?: [number, number][]
     }
-  | { kind: 'example'; text: string; gloss: string; note?: string }
-  | { kind: 'callout'; style: 'tip' | 'warning'; md: string }
+  | { kind: 'example'; text: string; gloss: LocText; note?: LocText }
+  | { kind: 'callout'; style: 'tip' | 'warning'; md: LocText }
 
 export interface SkillCellDef {
   cellId: string // "2sg", "dat.m", "v2.basic"
-  label: string // "tú form", "dative masculine"
+  label: LocText // "tú form", "dative masculine"
 }
 
 export interface Topic {
   id: string // "es-present-ar"
   lang: Lang
-  title: string
-  ruleSummary: string // one-liner shown on path & in error hints
+  title: LocText
+  ruleSummary: LocText // one-liner shown on path & in error hints
   cefr: Cefr
   dependencies: string[] // topic ids
   explanation: ExplanationBlock[]
@@ -136,14 +154,14 @@ export interface Topic {
   /** words introduced as flashcards before the drill */
   introLexemeIds: string[]
   drillItems: DrillSpec[]
-  errorHints: Partial<Record<DistractorStrategy, string>>
+  errorHints: Partial<Record<DistractorStrategy, LocText>>
 }
 
 export interface VocabPack {
   id: string // "es-pack-people"
   lang: Lang
   unitId: string
-  title: string
+  title: LocText
   lexemeIds: string[]
 }
 
@@ -197,14 +215,14 @@ export type DrillSpec =
       det: 'def' | 'indef' | 'kein'
       number: 'sg' | 'pl'
       /** '___' marks the article slot, '{noun}' the declined noun */
-      frames: { tokens: string[]; gloss: string }[]
+      frames: { tokens: string[]; gloss: LocText }[]
       cellId: string
     }
   | {
       gen: 'word-order'
-      items: { answer: string; also?: string[]; gloss: string; cellId: string }[]
+      items: { answer: string; also?: string[]; gloss: LocText; cellId: string }[]
     }
-  | { gen: 'authored'; exercises: ExerciseInstance[] }
+  | { gen: 'authored'; exercises: AuthoredExerciseInstance[] }
 
 /** A skill is the SRS unit: "topicId:cellId" for grammar, "lang/vocab/lemma:side" for words. */
 export type SkillId = string
@@ -237,6 +255,10 @@ export interface ExerciseInstance {
   /** grammatical suffix length for typo-strictness (see grading.ts) */
   strictSuffixLen?: number
 }
+
+/** authored content carries localizable glosses; resolved to a plain
+ *  ExerciseInstance (gloss: string) when the session is built */
+export type AuthoredExerciseInstance = Omit<ExerciseInstance, 'gloss'> & { gloss: LocText }
 
 export interface AuthoredExercise {
   id: string // "es-u1-ex-001"

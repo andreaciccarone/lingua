@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ExerciseInstance } from '../../content/types'
 import { normalize } from '../../engine/grading'
+import { useT } from '../../i18n/ui'
 
 interface Props {
   exercise: ExerciseInstance
@@ -10,6 +11,7 @@ interface Props {
 
 /** word-order builder: tap tiles into a sentence, tap again to remove */
 export default function Tiles({ exercise, onAnswer, disabled }: Props) {
+  const t = useT()
   const tiles = exercise.tiles ?? []
   const [chosen, setChosen] = useState<number[]>([])
   const [submitted, setSubmitted] = useState(false)
@@ -42,7 +44,7 @@ export default function Tiles({ exercise, onAnswer, disabled }: Props) {
           </button>
         ))}
         {chosen.length === 0 && (
-          <span className="py-2 text-sm text-slate-300">Tap the words in order…</span>
+          <span className="py-2 text-sm text-slate-300">{t('tapWordsInOrder')}</span>
         )}
       </div>
 
@@ -65,7 +67,7 @@ export default function Tiles({ exercise, onAnswer, disabled }: Props) {
           disabled={chosen.length !== tiles.length}
           className="mt-8 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow disabled:opacity-40"
         >
-          Check
+          {t('check')}
         </button>
       )}
     </div>

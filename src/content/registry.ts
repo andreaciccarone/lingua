@@ -1,11 +1,11 @@
 // One lookup surface over both languages' content.
 import type { AdjEntry, Lang, NounEntry, Topic, Unit, VerbEntry, VocabPack } from './types'
-import { ES_TOPIC_BY_ID, ES_UNITS } from './es'
+import { ES_TOPIC_BY_ID, ES_UNITS, ES_UPCOMING_UNITS } from './es'
 import { ES_LEXEME_BY_KEY, ES_PACKS } from './es/packs'
 import { ES_VERB_BY_ID } from './es/morphology/verbs'
 import { ES_NOUN_BY_ID } from './es/morphology/nouns'
 import { ES_ADJ_BY_ID } from './es/morphology/adjectives'
-import { DE_TOPIC_BY_ID, DE_UNITS } from './de'
+import { DE_TOPIC_BY_ID, DE_UNITS, DE_UPCOMING_UNITS } from './de'
 import { DE_LEXEME_BY_KEY, DE_PACKS } from './de/packs'
 import { DE_VERB_BY_ID } from './de/morphology/verbs'
 import { DE_NOUN_BY_ID } from './de/morphology/nouns'
@@ -17,6 +17,10 @@ export function topicById(id: string): Topic | undefined {
 
 export function unitsFor(lang: Lang): Unit[] {
   return lang === 'es' ? ES_UNITS : DE_UNITS
+}
+
+export function upcomingUnitsFor(lang: Lang): { title: string; blurb: { en: string; it: string } }[] {
+  return lang === 'es' ? ES_UPCOMING_UNITS : DE_UPCOMING_UNITS
 }
 
 export function packsFor(lang: Lang): VocabPack[] {

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Share, X } from 'lucide-react'
 import { isIOS, isStandalone } from '../lib/platform'
+import { useT } from '../i18n/ui'
 
 const DISMISS_KEY = 'lingua-install-hint-dismissed'
 
 export default function InstallHint() {
   const [dismissed, setDismissed] = useState(() => localStorage.getItem(DISMISS_KEY) === '1')
+  const t = useT()
 
   if (dismissed || !isIOS() || isStandalone()) return null
 
@@ -22,9 +24,7 @@ export default function InstallHint() {
         <X size={18} />
       </button>
       <p className="pr-6 text-sm leading-snug">
-        Install Lingua on your home screen: tap{' '}
-        <Share size={16} className="inline align-text-bottom" /> <b>Share</b>, then{' '}
-        <b>Add to Home Screen</b>. It works fully offline.
+        <Share size={16} className="inline align-text-bottom" /> {t('installHint')}
       </p>
     </div>
   )

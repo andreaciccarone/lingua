@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
 import { Flame, Snowflake } from 'lucide-react'
+import { loc, type PrimaryLang } from '../content/types'
 import { topicById, unitsFor } from '../content/registry'
+import { useT } from '../i18n/ui'
 import { getAllCards, getDays, type CardRecord } from '../data/db'
 import { computeStreak, daysOverdue, xpSeries, type StreakInfo } from '../data/stats'
 import { skillStrength } from '../engine/srs/scheduler'
@@ -22,7 +24,7 @@ interface StatsData {
   weakest: Weakest[]
 }
 
-function weakestSkills(cards: CardRecord[]): Weakest[] {
+function weakestSkills(cards: CardRecord[], primary: PrimaryLang): Weakest[] {
   return cards
     .filter((c) => c.kind === 'skill' && c.srs.reps >= 2)
     .sort((a, b) => b.srs.lapses - a.srs.lapses || a.srs.ease - b.srs.ease)
@@ -32,13 +34,16 @@ function weakestSkills(cards: CardRecord[]): Weakest[] {
       const [topicId, cellId] = c.id.split(':')
       const topic = topicById(topicId)
       const cell = topic?.skillCells.find((s) => s.cellId === cellId)
-      return { cardId: c.id, label: `${topic?.title ?? topicId} · ${cell?.label ?? cellId}` }
+      const topicLabel = topic ? loc(topic.title, primary) : topicId
+      const cellLabel = cell ? loc(cell.label, primary) : cellId
+      return { cardId: c.id, label: `${topicLabel} · ${cellLabel}` }
     })
 }
 
 export default function Stats() {
   const [data, setData] = useState<StatsData | null>(null)
-  const { dailyGoalXp, activeLang, loaded } = useSettings()
+  const { dailyGoalXp, activeLang, loaded, primary } = useSettings()
+  const t = useT()
 
   useEffect(() => {
     if (!loaded) return
@@ -65,42 +70,42 @@ export default function Stats() {
         wordsLearned: vocab.filter((c) => c.srs.reps > 0).length,
         wordsStrong: vocab.filter((c) => c.srs.intervalDays >= 30).length,
         topicStrength: strength,
-        weakest: weakestSkills(cards),
+        weakest: weakestSkills(cards, primary),
       })
     }
     load()
-  }, [dailyGoalXp, activeLang, loaded])
+  }, [dailyGoalXp, activeLang, loaded, primary])
 
-  if (!data) return <p className="pt-8 text-center text-slate-400">Loading…</p>
+  if (!data) return <p className="pt-8 text-center text-slate-400">{t('loading')}</p>
 
   const maxXp = Math.max(dailyGoalXp, ...data.xp.map((d) => d.xp))
 
   return (
     <div className="pt-4">
-      <h1 className="mb-6 text-2xl font-bold">Stats</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t('stats')}</h1>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Streak</p>
+          <p className="text-xs font-medium text-slate-400">{t('streak')}</p>
           <p className="flex items-center gap-1.5 text-xl font-bold">
             <Flame size={18} className="text-orange-500" />
-            {data.streak.current} {data.streak.current === 1 ? 'day' : 'days'}
+            {data.streak.current} {data.streak.current === 1 ? t('day') : t('days')}
           </p>
           {data.streak.freezesLeft > 0 && (
             <p className="mt-1 flex items-center gap-1 text-xs text-sky-500">
-              <Snowflake size={12} /> {data.streak.freezesLeft} freeze
-              {data.streak.freezesLeft > 1 ? 's' : ''} banked
+              <Snowflake size={12} /> {data.streak.freezesLeft}{' '}
+              {data.streak.freezesLeft > 1 ? t('freezesBanked') : t('freezeBanked')}
             </p>
           )}
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Words learned</p>
+          <p className="text-xs font-medium text-slate-400">{t('wordsLearned')}</p>
           <p className="text-xl font-bold">{data.wordsLearned}</p>
-          <p className="mt-1 text-xs text-slate-400">{data.wordsStrong} at 30+ days</p>
+          <p className="mt-1 text-xs text-slate-400">{data.wordsStrong} {t('at30Days')}</p>
         </div>
       </div>
 
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">XP · last 7 days</h2>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">{t('xpLast7')}</h2>
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex h-24 items-end justify-between gap-2">
           {data.xp.map((d) => (
@@ -113,10 +118,10 @@ export default function Stats() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-center text-xs text-slate-400">goal: {dailyGoalXp} XP/day</p>
+        <p className="mt-2 text-center text-xs text-slate-400">{t('goalPerDay', { n: dailyGoalXp })}</p>
       </div>
 
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">Topic mastery</h2>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">{t('topicMastery')}</h2>
       <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         {unitsFor(activeLang).map((unit) => (
           <div key={unit.id}>
@@ -130,7 +135,9 @@ export default function Stats() {
                 if (!topic) return null
                 return (
                   <div key={tid} className="flex items-center gap-2">
-                    <span className="w-36 truncate text-xs text-slate-600">{topic.title}</span>
+                    <span className="w-36 truncate text-xs text-slate-600">
+                      {loc(topic.title, primary)}
+                    </span>
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
                       <div
                         className={`h-full rounded-full ${
@@ -153,7 +160,7 @@ export default function Stats() {
 
       {data.weakest.length > 0 && (
         <>
-          <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">Weakest skills</h2>
+          <h2 className="mt-6 mb-2 text-sm font-semibold text-slate-500">{t('weakestSkills')}</h2>
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <ul className="space-y-1.5">
               {data.weakest.map((w) => (
@@ -166,7 +173,7 @@ export default function Stats() {
               href="/lesson/weak"
               className="mt-3 block w-full rounded-xl bg-indigo-600 py-3 text-center font-bold text-white shadow"
             >
-              Drill these now
+              {t('drillNow')}
             </Link>
           </div>
         </>

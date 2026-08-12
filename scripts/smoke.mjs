@@ -110,6 +110,15 @@ async function playSession(label) {
 try {
   await page.goto(url)
   await page.getByText('Lingua', { exact: true }).waitFor()
+
+  // 0. Italian is the default instruction language; switch to English for stable selectors
+  await page.locator('nav').getByText('Impara', { exact: true }).waitFor()
+  await page.screenshot({ path: `${shotDir}/0-italian-home.png` })
+  await page.locator('nav').getByText('Impostazioni', { exact: true }).click()
+  await page.getByText('🇬🇧 English').click()
+  await page.locator('nav').getByText('Learn', { exact: true }).waitFor()
+  await page.locator('nav').getByText('Learn', { exact: true }).click()
+  await page.getByText('Lingua', { exact: true }).waitFor()
   await page.screenshot({ path: `${shotDir}/1-home.png` })
 
   // 1. first grammar topic: intro page, then the lesson

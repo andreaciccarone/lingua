@@ -8,7 +8,7 @@ export const ES_PACK_BASICS: VocabPack = {
   id: 'es-pack-basics',
   lang: 'es',
   unitId: 'es-u1',
-  title: 'First words',
+  title: { en: 'First words', it: 'Prime parole' },
   lexemeIds: [
     'es/noun/casa',
     'es/noun/libro',
@@ -29,7 +29,7 @@ export const ES_PACK_FAMILY: VocabPack = {
   id: 'es-pack-family',
   lang: 'es',
   unitId: 'es-u1',
-  title: 'Family',
+  title: { en: 'Family', it: 'La famiglia' },
   lexemeIds: [
     'es/noun/familia',
     'es/noun/padre',
@@ -49,7 +49,7 @@ export const ES_PACK_DESCRIBE: VocabPack = {
   id: 'es-pack-describe',
   lang: 'es',
   unitId: 'es-u1',
-  title: 'Describing things',
+  title: { en: 'Describing things', it: 'Descrivere le cose' },
   lexemeIds: [
     'es/adj/alto',
     'es/adj/bajo',
@@ -68,7 +68,7 @@ export const ES_PACK_FOOD: VocabPack = {
   id: 'es-pack-food',
   lang: 'es',
   unitId: 'es-u2',
-  title: 'Food & drink',
+  title: { en: 'Food & drink', it: 'Cibo e bevande' },
   lexemeIds: [
     'es/noun/leche',
     'es/noun/queso',
@@ -91,7 +91,7 @@ export const ES_PACK_TOWN: VocabPack = {
   id: 'es-pack-town',
   lang: 'es',
   unitId: 'es-u2',
-  title: 'Around town',
+  title: { en: 'Around town', it: 'In città' },
   lexemeIds: [
     'es/noun/ciudad',
     'es/noun/escuela',
@@ -111,7 +111,7 @@ export const ES_PACK_DAILY: VocabPack = {
   id: 'es-pack-daily',
   lang: 'es',
   unitId: 'es-u2',
-  title: 'Daily life',
+  title: { en: 'Daily life', it: 'Vita quotidiana' },
   lexemeIds: [
     'es/verb/estudiar',
     'es/verb/escuchar',

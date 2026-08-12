@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import type { ExplanationBlock, Lang } from '../content/types'
+import { loc } from '../content/types'
+import { useSettings } from '../store/settings'
 import SpeakButton from './SpeakButton'
 
 /** minimal inline markdown: **bold** and *italic* */
@@ -13,6 +15,7 @@ export function mdInline(text: string): ReactNode[] {
 }
 
 export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock[]; lang: Lang }) {
+  const primary = useSettings((s) => s.primary)
   return (
     <div className="space-y-5">
       {blocks.map((block, i) => {
@@ -20,7 +23,7 @@ export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock
           case 'prose':
             return (
               <p key={i} className="leading-relaxed text-slate-700">
-                {mdInline(block.md)}
+                {mdInline(loc(block.md, primary))}
               </p>
             )
           case 'table': {
@@ -28,14 +31,14 @@ export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock
             return (
               <div key={i} className="overflow-x-auto">
                 <p className="mb-1 text-xs font-semibold tracking-wide text-slate-400 uppercase">
-                  {block.caption}
+                  {loc(block.caption, primary)}
                 </p>
                 <table className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-sm">
                   <thead>
                     <tr className="bg-slate-50">
                       {block.header.map((h, c) => (
                         <th key={c} className="px-3 py-2 text-left font-semibold text-slate-500">
-                          {h}
+                          {loc(h, primary)}
                         </th>
                       ))}
                     </tr>
@@ -54,7 +57,7 @@ export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock
                                   : 'font-medium'
                             }`}
                           >
-                            {cell}
+                            {loc(cell, primary)}
                           </td>
                         ))}
                       </tr>
@@ -73,8 +76,8 @@ export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock
                 <div>
                   <p className="font-semibold text-indigo-800">{block.text}</p>
                   <p className="text-sm text-slate-500">
-                    {block.gloss}
-                    {block.note && <span className="text-slate-400"> · {block.note}</span>}
+                    {loc(block.gloss, primary)}
+                    {block.note && <span className="text-slate-400"> · {loc(block.note, primary)}</span>}
                   </p>
                 </div>
                 <SpeakButton text={block.text} lang={lang} />
@@ -95,7 +98,7 @@ export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock
                 ) : (
                   <Lightbulb size={18} className="mt-0.5 shrink-0" />
                 )}
-                <p>{mdInline(block.md)}</p>
+                <p>{mdInline(loc(block.md, primary))}</p>
               </div>
             )
         }

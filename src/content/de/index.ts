@@ -7,7 +7,7 @@ export const DE_UNITS: Unit[] = [
     id: 'de-u1',
     lang: 'de',
     title: 'Erste Schritte',
-    blurb: 'Genders, pronouns, first verbs and word order',
+    blurb: { en: 'Genders, pronouns, first verbs and word order', it: 'Generi, pronomi, primi verbi e ordine delle parole' },
     topicIds: [
       'de-noun-gender',
       'de-personal-pronouns',
@@ -22,7 +22,7 @@ export const DE_UNITS: Unit[] = [
     id: 'de-u2',
     lang: 'de',
     title: 'Sätze bauen',
-    blurb: 'Questions, plurals, cases and negation',
+    blurb: { en: 'Questions, plurals, cases and negation', it: 'Domande, plurali, casi e negazione' },
     topicIds: [
       'de-questions',
       'de-plurals',
@@ -37,3 +37,11 @@ export const DE_UNITS: Unit[] = [
 
 export const DE_TOPICS: Topic[] = [...DE_U1_TOPICS, ...DE_U2_TOPICS]
 export const DE_TOPIC_BY_ID = new Map(DE_TOPICS.map((t) => [t.id, t]))
+
+/** designed but not yet authored — shown greyed-out on the path */
+export const DE_UPCOMING_UNITS: { title: string; blurb: { en: string; it: string } }[] = [
+  { title: 'Modal & Co', blurb: { en: 'Modal verbs, separable verbs, imperative', it: 'Verbi modali, verbi separabili, imperativo' } },
+  { title: 'Der Dativ', blurb: { en: 'The dative case and prepositions', it: 'Il dativo e le preposizioni' } },
+  { title: 'Vergangenheit', blurb: { en: 'The perfect tense', it: 'Il passato prossimo (Perfekt)' } },
+  { title: 'Komplexe Sätze', blurb: { en: 'Subordinate clauses', it: 'Le frasi subordinate' } },
+]

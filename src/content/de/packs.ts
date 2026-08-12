@@ -8,7 +8,7 @@ export const DE_PACKS: VocabPack[] = [
     id: 'de-pack-basics',
     lang: 'de',
     unitId: 'de-u1',
-    title: 'First words',
+    title: { en: 'First words', it: 'Prime parole' },
     lexemeIds: [
       'de/noun/mann',
       'de/noun/frau',
@@ -28,7 +28,7 @@ export const DE_PACKS: VocabPack[] = [
     id: 'de-pack-family',
     lang: 'de',
     unitId: 'de-u1',
-    title: 'Family',
+    title: { en: 'Family', it: 'La famiglia' },
     lexemeIds: [
       'de/noun/familie',
       'de/noun/vater',
@@ -46,7 +46,7 @@ export const DE_PACKS: VocabPack[] = [
     id: 'de-pack-food',
     lang: 'de',
     unitId: 'de-u2',
-    title: 'Food & drink',
+    title: { en: 'Food & drink', it: 'Cibo e bevande' },
     lexemeIds: [
       'de/noun/milch',
       'de/noun/käse',
@@ -66,7 +66,7 @@ export const DE_PACKS: VocabPack[] = [
     id: 'de-pack-town',
     lang: 'de',
     unitId: 'de-u2',
-    title: 'Around town',
+    title: { en: 'Around town', it: 'In città' },
     lexemeIds: [
       'de/noun/stadt',
       'de/noun/schule',
@@ -84,7 +84,7 @@ export const DE_PACKS: VocabPack[] = [
     id: 'de-pack-daily',
     lang: 'de',
     unitId: 'de-u2',
-    title: 'Daily life',
+    title: { en: 'Daily life', it: 'Vita quotidiana' },
     lexemeIds: [
       'de/noun/tag',
       'de/noun/nacht',

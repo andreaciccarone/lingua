@@ -1,4 +1,6 @@
-import type { AdjEntry, ExerciseInstance, NounEntry, VerbEntry } from '../content/types'
+import type { AdjEntry, ExerciseInstance, NounEntry, PrimaryLang, VerbEntry } from '../content/types'
+import { glossLexeme } from '../i18n/gloss-it'
+import { tFor } from '../i18n/ui'
 import { hashSeed, mulberry32, pick, shuffled } from './exercises'
 
 export type VocabLexeme = VerbEntry | NounEntry | AdjEntry
@@ -22,12 +24,12 @@ export function vocabSkillId(l: VocabLexeme, side: 'recog' | 'prod'): string {
 }
 
 /** new-word intro: front = target word (+TTS), back = gloss */
-export function genFlashcard(l: VocabLexeme): ExerciseInstance {
+export function genFlashcard(l: VocabLexeme, primary: PrimaryLang): ExerciseInstance {
   return {
     type: 'flashcard',
     lang: l.lang,
     sentence: [displayForm(l)],
-    gloss: l.gloss,
+    gloss: glossLexeme(l, primary),
     answer: displayForm(l),
     accepted: [],
     skillIds: [vocabSkillId(l, 'recog')],
@@ -40,30 +42,36 @@ export function genVocabRecognition(
   l: VocabLexeme,
   pool: VocabLexeme[],
   seed: string,
+  primary: PrimaryLang,
 ): ExerciseInstance {
   const rand = mulberry32(hashSeed(seed))
+  const target = glossLexeme(l, primary)
   const distractorGlosses = shuffled(
-    pool.filter((p) => p.id !== l.id && p.gloss !== l.gloss),
+    pool.filter((p) => p.id !== l.id && glossLexeme(p, primary) !== target),
     rand,
   )
     .slice(0, 3)
-    .map((p) => ({ text: p.gloss, strategy: 'vocabConfusable' as const }))
+    .map((p) => ({ text: glossLexeme(p, primary), strategy: 'vocabConfusable' as const }))
   return {
     type: 'mc',
     lang: l.lang,
     sentence: [displayForm(l)],
     gapIndex: undefined,
-    gloss: 'What does this mean?',
-    answer: l.gloss,
+    gloss: tFor(primary)('whatDoesThisMean'),
+    answer: target,
     accepted: [],
-    options: shuffled([{ text: l.gloss }, ...distractorGlosses], rand),
+    options: shuffled([{ text: target }, ...distractorGlosses], rand),
     skillIds: [vocabSkillId(l, 'recog')],
     ttsText: displayForm(l),
   }
 }
 
 /** production: see the English, type the word (nouns: with article) */
-export function genVocabProduction(l: VocabLexeme, seed: string): ExerciseInstance {
+export function genVocabProduction(
+  l: VocabLexeme,
+  seed: string,
+  primary: PrimaryLang,
+): ExerciseInstance {
   void seed
   const full = displayForm(l)
   const accepted = isNoun(l) && l.lang === 'es' ? [l.lemma] : [] // Spanish: bare noun accepted
@@ -72,7 +80,7 @@ export function genVocabProduction(l: VocabLexeme, seed: string): ExerciseInstan
     lang: l.lang,
     sentence: ['___'],
     gapIndex: 0,
-    gloss: isNoun(l) ? `the ${l.gloss}` : l.gloss,
+    gloss: primary === 'it' ? glossLexeme(l, 'it') : isNoun(l) ? `the ${l.gloss}` : l.gloss,
     answer: full,
     accepted,
     skillIds: [vocabSkillId(l, 'prod')],
@@ -87,6 +95,7 @@ export function genVocabListening(
   l: VocabLexeme,
   pool: VocabLexeme[],
   seed: string,
+  primary: PrimaryLang,
 ): ExerciseInstance {
   const rand = mulberry32(hashSeed(seed))
   const target = displayForm(l)
@@ -100,7 +109,7 @@ export function genVocabListening(
     type: 'listen-cloze',
     lang: l.lang,
     sentence: [],
-    gloss: 'What do you hear?',
+    gloss: tFor(primary)('whatDoYouHear'),
     answer: target,
     accepted: [],
     options: shuffled([{ text: target }, ...distractors], rand),
@@ -110,17 +119,21 @@ export function genVocabListening(
 }
 
 /** pack-start warmup: match words to meanings */
-export function genVocabMatch(lexemes: VocabLexeme[], seed: string): ExerciseInstance {
+export function genVocabMatch(
+  lexemes: VocabLexeme[],
+  seed: string,
+  primary: PrimaryLang,
+): ExerciseInstance {
   const rand = mulberry32(hashSeed(seed))
   const chosen = shuffled(lexemes, rand).slice(0, 5)
   return {
     type: 'match',
     lang: chosen[0].lang,
     sentence: [],
-    gloss: 'Match each word with its meaning',
+    gloss: tFor(primary)('matchWordsMeaning'),
     answer: '',
     accepted: [],
-    pairs: chosen.map((l) => [displayForm(l), l.gloss]),
+    pairs: chosen.map((l) => [displayForm(l), glossLexeme(l, primary)]),
     skillIds: chosen.map((l) => vocabSkillId(l, 'recog')),
   }
 }
