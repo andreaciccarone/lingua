@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
-import { BookA, Check, Flame, Lock } from 'lucide-react'
+import { BookA, Check, Flame, Hourglass, Lock } from 'lucide-react'
 import type { Lang } from '../content/types'
 import { loc } from '../content/types'
 import { packsFor, topicById, unitsFor, upcomingUnitsFor } from '../content/registry'
@@ -162,9 +162,9 @@ export default function Home() {
               {t('unit')} {unitsFor(lang).length + i + 1} · {unit.title}
             </p>
             <p className="mb-3 text-sm text-slate-400">{loc(unit.blurb, primary)}</p>
-            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-100 p-4">
+            <div className="flex items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
               <span className="text-sm font-semibold text-slate-400">{t('comingSoon')}</span>
-              <Lock size={16} className="text-slate-300" />
+              <Hourglass size={16} className="text-slate-300" />
             </div>
           </section>
         ))}
