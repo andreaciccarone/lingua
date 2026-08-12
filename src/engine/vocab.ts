@@ -14,6 +14,8 @@ export function displayForm(l: VocabLexeme): string {
   if (isNoun(l) && l.es)
     return `${l.es.singularArticle ?? (l.es.gender === 'm' ? 'el' : 'la')} ${l.lemma}`
   if (isNoun(l) && l.de) return `${{ m: 'der', f: 'die', n: 'das' }[l.de.gender]} ${l.lemma}`
+  // Spanish reflexive verbs are learned with -se: levantarse
+  if ('es' in l && l.es && 'reflexive' in l.es && l.es.reflexive) return `${l.lemma}se`
   return l.lemma
 }
 

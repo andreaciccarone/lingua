@@ -8,6 +8,21 @@ function nounForm(noun: NounEntry, number: EsNumber): string {
   return number === 'sg' ? noun.lemma : pluralEs(noun)
 }
 
+/** learner errors for adjectives that don't inflect for gender: *granda, *azulo */
+function overAgreementForms(
+  adj: AdjEntry,
+  number: EsNumber,
+): { text: string; strategy: 'wrongGenderArticle' }[] {
+  if (!adj.es?.invariable) return []
+  const base = adj.lemma
+  const stem = base.endsWith('e') ? base.slice(0, -1) : base
+  const plural = number === 'pl' ? 's' : ''
+  return [
+    { text: stem + 'o' + plural, strategy: 'wrongGenderArticle' },
+    { text: stem + 'a' + plural, strategy: 'wrongGenderArticle' },
+  ]
+}
+
 /** article pick: "___ casa" → la. Distractors are wrong-gender / wrong-number articles. */
 export function genArticleDrill(
   noun: NounEntry,
@@ -95,6 +110,10 @@ export function genAdjAgreeDrill(
         | 'wrongNumber',
     }))
     .filter((c) => c.text !== answer)
+    // Invariable adjectives (grande, azul) have too few distinct forms to fill a
+    // bank. Their real failure mode is over-agreement — *granda, *azula — which
+    // makes a far better distractor than another copy of the same form.
+    .concat(overAgreementForms(adj, number))
   return {
     type: 'mc',
     lang: 'es',

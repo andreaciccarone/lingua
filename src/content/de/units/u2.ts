@@ -372,6 +372,7 @@ export const DE_U2_TOPICS: Topic[] = [
             options: [
               { text: 'Ich sehe den Mann.' },
               { text: 'Ich sehe der Mann.', strategy: 'wrongCaseArticle' },
+              { text: 'Ich sehe dem Mann.', strategy: 'wrongCaseArticle' },
             ],
             skillIds: ['de-nom-acc:acc.m'],
           },

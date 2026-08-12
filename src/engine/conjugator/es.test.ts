@@ -138,6 +138,49 @@ describe('stem changes', () => {
     })
   })
 
+  it('preterite spelling changes: busqué, llegué, empecé', () => {
+    expect(conjugateEs(v('buscar'), 'pret', '1sg').form).toBe('busqué')
+    expect(conjugateEs(v('llegar'), 'pret', '1sg').form).toBe('llegué')
+    expect(conjugateEs(v('empezar'), 'pret', '1sg').form).toBe('empecé')
+    expect(conjugateEs(v('buscar'), 'pret', '3sg').form).toBe('buscó')
+  })
+
+  it('preterite y-spelling: leyó, leyeron', () => {
+    expect(conjugateEs(v('leer'), 'pret', '3sg').form).toBe('leyó')
+    expect(conjugateEs(v('leer'), 'pret', '3pl').form).toBe('leyeron')
+    expect(conjugateEs(v('leer'), 'pret', '1sg').form).toBe('leí')
+  })
+
+  it('preterite -ir stem changes: pidió, durmieron (3rd persons only)', () => {
+    expect(conjugateEs(v('pedir'), 'pret', '3sg').form).toBe('pidió')
+    expect(conjugateEs(v('pedir'), 'pret', '3pl').form).toBe('pidieron')
+    expect(conjugateEs(v('pedir'), 'pret', '1sg').form).toBe('pedí')
+    expect(conjugateEs(v('dormir'), 'pret', '3sg').form).toBe('durmió')
+    expect(conjugateEs(v('dormir'), 'pret', '1pl').form).toBe('dormimos')
+  })
+
+  it('strong preterites from overrides: vine, dije/dijeron, di/dio, vi/vio', () => {
+    expect(conjugateEs(v('venir'), 'pret', '1sg').form).toBe('vine')
+    expect(conjugateEs(v('decir'), 'pret', '3pl').form).toBe('dijeron')
+    expect(conjugateEs(v('dar'), 'pret', '3sg').form).toBe('dio')
+    expect(conjugateEs(v('ver'), 'pret', '1sg').form).toBe('vi')
+  })
+
+  it('new present irregulars: vengo/vienes/venimos, veo/ves/veis, doy/dais', () => {
+    expect(paradigmEs(v('venir'), 'pres')).toEqual({
+      '1sg': 'vengo',
+      '2sg': 'vienes',
+      '3sg': 'viene',
+      '1pl': 'venimos',
+      '2pl': 'venís',
+      '3pl': 'vienen',
+    })
+    expect(conjugateEs(v('ver'), 'pres', '2pl').form).toBe('veis')
+    expect(conjugateEs(v('dar'), 'pres', '2pl').form).toBe('dais')
+    expect(conjugateEs(v('jugar'), 'pres', '2sg').form).toBe('juegas')
+    expect(conjugateEs(v('jugar'), 'pres', '1pl').form).toBe('jugamos')
+  })
+
   it('reports applied rules for feedback', () => {
     expect(conjugateEs(v('querer'), 'pres', '2sg').appliedRules).toContain('stemChange:e>ie')
     expect(conjugateEs(v('hacer'), 'pres', '1sg').appliedRules).toContain('yoIrregular')

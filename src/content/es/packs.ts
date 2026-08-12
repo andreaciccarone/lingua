@@ -127,6 +127,134 @@ export const ES_PACK_DAILY: VocabPack = {
   ],
 }
 
+export const ES_PACK_HOUSE: VocabPack = {
+  id: 'es-pack-house',
+  lang: 'es',
+  unitId: 'es-u3',
+  title: { en: 'Around the house', it: 'In casa' },
+  lexemeIds: [
+    'es/noun/cocina',
+    'es/noun/baño',
+    'es/noun/dormitorio',
+    'es/noun/salón',
+    'es/noun/cama',
+    'es/noun/ducha',
+    'es/noun/jardín',
+    'es/noun/espejo',
+    'es/noun/puerta',
+    'es/noun/ventana',
+    'es/noun/mesa',
+    'es/noun/silla',
+  ],
+}
+
+export const ES_PACK_ACTIONS: VocabPack = {
+  id: 'es-pack-actions',
+  lang: 'es',
+  unitId: 'es-u3',
+  title: { en: 'Verbs on the move', it: 'Verbi in movimento' },
+  lexemeIds: [
+    'es/verb/venir',
+    'es/verb/salir',
+    'es/verb/poner',
+    'es/verb/decir',
+    'es/verb/ver',
+    'es/verb/dar',
+    'es/verb/volver',
+    'es/verb/jugar',
+    'es/verb/dormir',
+    'es/verb/empezar',
+    'es/verb/pensar',
+    'es/verb/entender',
+  ],
+}
+
+export const ES_PACK_CLOTHES: VocabPack = {
+  id: 'es-pack-clothes',
+  lang: 'es',
+  unitId: 'es-u4',
+  title: { en: 'Clothes & shopping', it: 'Vestiti e acquisti' },
+  lexemeIds: [
+    'es/noun/camisa',
+    'es/noun/camiseta',
+    'es/noun/pantalón',
+    'es/noun/vestido',
+    'es/noun/falda',
+    'es/noun/abrigo',
+    'es/noun/chaqueta',
+    'es/noun/sombrero',
+    'es/noun/dinero',
+    'es/noun/precio',
+    'es/noun/regalo',
+    'es/verb/llevar',
+    'es/verb/pagar',
+    'es/verb/buscar',
+  ],
+}
+
+export const ES_PACK_DESCRIBE2: VocabPack = {
+  id: 'es-pack-describe2',
+  lang: 'es',
+  unitId: 'es-u4',
+  title: { en: 'More descriptions', it: 'Altre descrizioni' },
+  lexemeIds: [
+    'es/adj/rápido',
+    'es/adj/lento',
+    'es/adj/largo',
+    'es/adj/corto',
+    'es/adj/guapo',
+    'es/adj/divertido',
+    'es/adj/aburrido',
+    'es/adj/importante',
+    'es/adj/moreno',
+    'es/adj/joven',
+    'es/adj/simpático',
+  ],
+}
+
+export const ES_PACK_ROUTINE: VocabPack = {
+  id: 'es-pack-routine',
+  lang: 'es',
+  unitId: 'es-u5',
+  title: { en: 'Daily routine', it: 'La routine quotidiana' },
+  lexemeIds: [
+    'es/verb/levantar',
+    'es/verb/duchar',
+    'es/verb/acostar',
+    'es/verb/despertar',
+    'es/verb/desayunar',
+    'es/verb/cenar',
+    'es/verb/terminar',
+    'es/noun/desayuno',
+    'es/noun/comida',
+    'es/noun/cena',
+    'es/noun/mañana',
+    'es/noun/tarde',
+  ],
+}
+
+export const ES_PACK_TRAVEL: VocabPack = {
+  id: 'es-pack-travel',
+  lang: 'es',
+  unitId: 'es-u6',
+  title: { en: 'Travel', it: 'In viaggio' },
+  lexemeIds: [
+    'es/noun/viaje',
+    'es/noun/tren',
+    'es/noun/avión',
+    'es/noun/autobús',
+    'es/noun/hotel',
+    'es/noun/maleta',
+    'es/noun/billete',
+    'es/noun/aeropuerto',
+    'es/noun/mar',
+    'es/noun/montaña',
+    'es/verb/viajar',
+    'es/verb/visitar',
+    'es/verb/llegar',
+  ],
+}
+
 export const ES_PACKS: VocabPack[] = [
   ES_PACK_BASICS,
   ES_PACK_FAMILY,
@@ -134,6 +262,12 @@ export const ES_PACKS: VocabPack[] = [
   ES_PACK_FOOD,
   ES_PACK_TOWN,
   ES_PACK_DAILY,
+  ES_PACK_HOUSE,
+  ES_PACK_ACTIONS,
+  ES_PACK_CLOTHES,
+  ES_PACK_DESCRIBE2,
+  ES_PACK_ROUTINE,
+  ES_PACK_TRAVEL,
 ]
 
 /** lemma-key ("casa") -> lexeme, for resolving vocab skill ids back to words */

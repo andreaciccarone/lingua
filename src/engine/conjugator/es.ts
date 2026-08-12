@@ -5,6 +5,8 @@ export type RuleTag =
   | 'regular'
   | 'irregularCell'
   | 'yoIrregular'
+  | 'spellingChange'
+  | 'pretStemChange'
   | `stemChange:${StemChange}`
 
 export interface ConjugatedForm {
@@ -68,9 +70,51 @@ export function conjugateEs(verb: VerbEntry, tense: TenseKey, person: PersonKey)
     rules.push(`stemChange:${es.stemChange}`)
   }
 
-  const ending = ES_ENDINGS[tense][es.class][PERSONS.indexOf(person)]
+  let ending = ES_ENDINGS[tense][es.class][PERSONS.indexOf(person)]
+
+  if (tense === 'pret') {
+    // -ir stem-changers shift the vowel in 3rd persons: pidió, durmieron
+    if (es.class === 'ir' && es.stemChange && (person === '3sg' || person === '3pl')) {
+      const to = es.stemChange.startsWith('o') ? 'u' : 'i'
+      const from = es.stemChange[0]
+      const i = stem.lastIndexOf(from)
+      if (i !== -1) {
+        stem = stem.slice(0, i) + to + stem.slice(i + 1)
+        rules.push('pretStemChange')
+      }
+    }
+    // yo spelling: buscar→busqué, llegar→llegué, empezar→empecé
+    if (person === '1sg' && es.class === 'ar') {
+      if (stem.endsWith('c')) {
+        stem = stem.slice(0, -1) + 'qu'
+        rules.push('spellingChange')
+      } else if (stem.endsWith('g')) {
+        stem += 'u'
+        rules.push('spellingChange')
+      } else if (stem.endsWith('z')) {
+        stem = stem.slice(0, -1) + 'c'
+        rules.push('spellingChange')
+      }
+    }
+    // vowel stems turn ió/ieron into yó/yeron: leyó, creyeron
+    if (es.class !== 'ar' && /[aeo]$/.test(stem) && (person === '3sg' || person === '3pl')) {
+      ending = ending.replace('i', 'y')
+      rules.push('spellingChange')
+    }
+  }
+
   if (rules.length === 0) rules.push('regular')
   return { form: stem + ending, appliedRules: rules }
+}
+
+/** reflexive pronoun for a person (me levanto, te levantas…) */
+export const ES_REFLEXIVE: Record<PersonKey, string> = {
+  '1sg': 'me',
+  '2sg': 'te',
+  '3sg': 'se',
+  '1pl': 'nos',
+  '2pl': 'os',
+  '3pl': 'se',
 }
 
 /** Full paradigm for one tense — also renders the explanation tables. */

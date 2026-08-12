@@ -10,7 +10,7 @@ import type {
   VerbEntry,
 } from '../content/types'
 import { loc, PERSONS } from '../content/types'
-import { conjugateEs, ES_ENDINGS, paradigmEs } from './conjugator/es'
+import { conjugateEs, ES_ENDINGS, ES_REFLEXIVE, paradigmEs } from './conjugator/es'
 import { glossVerb } from '../i18n/gloss-it'
 import { tFor } from '../i18n/ui'
 
@@ -78,9 +78,10 @@ function conjugationCandidates(verb: VerbEntry, tense: TenseKey, person: PersonK
     out.push({ text: conjugateEs(verb, tense, p).form, strategy: 'wrongPerson' })
   }
 
-  // wrongClass: endings of the other conjugation classes on this stem
+  // wrongClass: endings of the other conjugation classes on this stem.
+  // Skipped for tiny stems (ir -> '', ver -> 'v'), which would yield bare endings.
   const stem = verb.lemma.slice(0, -2)
-  if (tense === 'pres' || tense === 'pret') {
+  if ((tense === 'pres' || tense === 'pret') && stem.length >= 2) {
     for (const cls of ['ar', 'er', 'ir'] as SpanishVerbClass[]) {
       if (cls === es.class) continue
       out.push({
@@ -156,19 +157,23 @@ export function genConjugationDrill(params: ConjugationDrillParams): ExerciseIns
     PERSONS.indexOf(person)
   ]
 
-  const sentence = [capitalize(pronoun), '___', `(${verb.lemma})`]
-  const gloss = glossVerb(verb, person, primary)
+  const refl = verb.es!.reflexive ? ES_REFLEXIVE[person] : null
+  const displayLemma = verb.es!.reflexive ? `${verb.lemma}se` : verb.lemma
+  const sentence = refl
+    ? [capitalize(pronoun), refl, '___', `(${displayLemma})`]
+    : [capitalize(pronoun), '___', `(${displayLemma})`]
+  const gloss = glossVerb(verb, person, primary, tense)
 
   const base: ExerciseInstance = {
     type,
     lang: 'es',
     sentence,
-    gapIndex: 1,
+    gapIndex: refl ? 2 : 1,
     gloss,
     answer: form,
     accepted: [form],
     skillIds: [`${topicId}:${person}`],
-    ttsText: `${pronoun} ${form}`,
+    ttsText: refl ? `${pronoun} ${refl} ${form}` : `${pronoun} ${form}`,
     strictSuffixLen: Math.min(ending.length, form.length - 1),
   }
 
@@ -202,12 +207,16 @@ export function genMatchDrill(params: MatchDrillParams): ExerciseInstance {
   const persons = (params.persons ?? shuffled(PERSONS, rand).slice(0, 5)).filter(
     (p, _, all) => !all.some((q) => q !== p && paradigm[q] === paradigm[p]),
   )
-  const pairs: [string, string][] = persons.map((p) => [PRONOUNS[p][0], paradigm[p]])
+  const refl = verb.es?.reflexive
+  const pairs: [string, string][] = persons.map((p) => [
+    PRONOUNS[p][0],
+    refl ? `${ES_REFLEXIVE[p]} ${paradigm[p]}` : paradigm[p],
+  ])
   return {
     type: 'match',
     lang: 'es',
     sentence: [],
-    gloss: tFor(primary)('matchPronounForm', { verb: verb.lemma }),
+    gloss: tFor(primary)('matchPronounForm', { verb: refl ? `${verb.lemma}se` : verb.lemma }),
     answer: '',
     accepted: [],
     pairs,

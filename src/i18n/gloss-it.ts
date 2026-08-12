@@ -1,4 +1,11 @@
-import type { AdjEntry, NounEntry, PersonKey, PrimaryLang, VerbEntry } from '../content/types'
+import type {
+  AdjEntry,
+  NounEntry,
+  PersonKey,
+  PrimaryLang,
+  TenseKey,
+  VerbEntry,
+} from '../content/types'
 import { PERSONS } from '../content/types'
 
 /** Italian glossing for GENERATED exercises: "lui parla", "la casa bianca", "delle case".
@@ -54,8 +61,31 @@ const IT_ENDINGS: Record<'are' | 'ere' | 'ire', string[]> = {
   ire: ['o', 'i', 'e', 'iamo', 'ite', 'ono'],
 }
 
-/** conjugate an Italian gloss verb in the present (regular rules + overrides) */
+const IT_REFLEXIVE: Record<PersonKey, string> = {
+  '1sg': 'mi',
+  '2sg': 'ti',
+  '3sg': 'si',
+  '1pl': 'ci',
+  '2pl': 'vi',
+  '3pl': 'si',
+}
+
+/** conjugate an Italian gloss verb in the present.
+ *  Handles reflexives ("alzarsi" → "mi alzo") and multi-word glosses
+ *  ("fare la spesa" → "faccio la spesa") — first word is the verb. */
 export function conjugateIt(infinitive: string, person: PersonKey): string {
+  const [head, ...tail] = infinitive.split(' ')
+  const suffix = tail.length ? ' ' + tail.join(' ') : ''
+
+  // reflexive: alzarsi -> alzare + clitic
+  if (head.endsWith('rsi')) {
+    const base = head.slice(0, -3) + 're'
+    return `${IT_REFLEXIVE[person]} ${conjugateItPlain(base, person)}${suffix}`
+  }
+  return conjugateItPlain(head, person) + suffix
+}
+
+function conjugateItPlain(infinitive: string, person: PersonKey): string {
   const idx = PERSONS.indexOf(person)
   const irregular = IT_IRREGULAR[infinitive]
   if (irregular) return irregular[idx]
@@ -63,7 +93,7 @@ export function conjugateIt(infinitive: string, person: PersonKey): string {
   const cls = infinitive.slice(-3) as 'are' | 'ere' | 'ire'
   if (!IT_ENDINGS[cls]) return infinitive
   let stem = infinitive.slice(0, -3)
-  let ending = IT_ENDINGS[cls][idx]
+  const ending = IT_ENDINGS[cls][idx]
 
   if (cls === 'are') {
     // giocare -> giochi; pagare -> paghi (h before i-endings)
@@ -71,17 +101,148 @@ export function conjugateIt(infinitive: string, person: PersonKey): string {
     // mangiare -> mangi; cominciare -> cominci (no double i)
     if (/[cg]i$/.test(stem) && ending.startsWith('i')) stem = stem.slice(0, -1)
   }
-  // -ire verbs like capire take -isc-, but none of our gloss verbs need it so far
-  void ending
-  return stem + IT_ENDINGS[cls][idx]
+  return stem + ending
 }
 
-/** "he/she speaks" or "lui/lei parla" */
-export function glossVerb(verb: VerbEntry, person: PersonKey, primary: PrimaryLang): string {
+/** irregular Italian past participles; everything else follows -ato/-uto/-ito */
+const IT_PARTICIPLE: Record<string, string> = {
+  essere: 'stato',
+  fare: 'fatto',
+  dire: 'detto',
+  vedere: 'visto',
+  mettere: 'messo',
+  prendere: 'preso',
+  leggere: 'letto',
+  scrivere: 'scritto',
+  bere: 'bevuto',
+  comprendere: 'compreso',
+  conoscere: 'conosciuto',
+  rimanere: 'rimasto',
+  venire: 'venuto',
+  aprire: 'aperto',
+  vivere: 'vissuto',
+  correre: 'corso',
+  chiedere: 'chiesto',
+  piacere: 'piaciuto',
+}
+
+/** verbs that build the passato prossimo with essere (agreeing participle) */
+const IT_ESSERE_VERBS = new Set([
+  'essere',
+  'andare',
+  'venire',
+  'uscire',
+  'arrivare',
+  'tornare',
+  'entrare',
+  'partire',
+  'stare',
+  'rimanere',
+  'piacere',
+])
+
+const PLURAL_PERSONS: ReadonlySet<PersonKey> = new Set(['1pl', '2pl', '3pl'])
+
+function participleIt(infinitive: string): string {
+  const irregular = IT_PARTICIPLE[infinitive]
+  if (irregular) return irregular
+  if (infinitive.endsWith('are')) return infinitive.slice(0, -3) + 'ato'
+  if (infinitive.endsWith('ere')) return infinitive.slice(0, -3) + 'uto'
+  if (infinitive.endsWith('ire')) return infinitive.slice(0, -3) + 'ito'
+  return infinitive
+}
+
+/** participle agrees with the subject when the auxiliary is essere */
+function agree(participle: string, person: PersonKey): string {
+  return PLURAL_PERSONS.has(person) ? participle.slice(0, -1) + 'i' : participle
+}
+
+/** passato prossimo — how an Italian actually renders the Spanish preterite:
+ *  "ho parlato", "sono andato", "mi sono alzato" */
+export function pastIt(infinitive: string, person: PersonKey): string {
+  const [head, ...tail] = infinitive.split(' ')
+  const suffix = tail.length ? ' ' + tail.join(' ') : ''
+
+  if (head.endsWith('rsi')) {
+    const base = head.slice(0, -3) + 're'
+    const part = agree(participleIt(base), person)
+    return `${IT_REFLEXIVE[person]} ${conjugateItPlain('essere', person)} ${part}${suffix}`
+  }
+  const part = participleIt(head)
+  if (IT_ESSERE_VERBS.has(head)) {
+    return `${conjugateItPlain('essere', person)} ${agree(part, person)}${suffix}`
+  }
+  return `${conjugateItPlain('avere', person)} ${part}${suffix}`
+}
+
+// ---------- English simple past (secondary instruction language) ----------
+
+const EN_PAST: Record<string, string> = {
+  be: 'was/were',
+  have: 'had',
+  do: 'did',
+  go: 'went',
+  speak: 'spoke',
+  tell: 'told',
+  meet: 'met',
+  lose: 'lost',
+  bring: 'brought',
+  feel: 'felt',
+  send: 'sent',
+  spend: 'spent',
+  cost: 'cost',
+  say: 'said',
+  see: 'saw',
+  give: 'gave',
+  put: 'put',
+  come: 'came',
+  know: 'knew',
+  eat: 'ate',
+  drink: 'drank',
+  sleep: 'slept',
+  read: 'read',
+  write: 'wrote',
+  take: 'took',
+  find: 'found',
+  run: 'ran',
+  buy: 'bought',
+  pay: 'paid',
+  think: 'thought',
+  begin: 'began',
+  understand: 'understood',
+  sing: 'sang',
+  get: 'got',
+  wear: 'wore',
+  leave: 'left',
+  sit: 'sat',
+  make: 'made',
+}
+
+function pastEn(base: string): string {
+  const [head, ...tail] = base.split(' ')
+  const suffix = tail.length ? ' ' + tail.join(' ') : ''
+  const irregular = EN_PAST[head]
+  if (irregular) return irregular + suffix
+  if (head.endsWith('e')) return head + 'd' + suffix
+  if (/[^aeiou]y$/.test(head)) return head.slice(0, -1) + 'ied' + suffix
+  return head + 'ed' + suffix
+}
+
+/** "he/she speaks" or "lui/lei parla"; past tense renders as
+ *  passato prossimo in Italian and simple past in English */
+export function glossVerb(
+  verb: VerbEntry,
+  person: PersonKey,
+  primary: PrimaryLang,
+  tense: TenseKey = 'pres',
+): string {
+  const past = tense === 'pret' || tense === 'perf' || tense === 'praet'
   if (primary === 'it' && verb.glossIt) {
-    return `${IT_PRONOUNS[person]} ${conjugateIt(verb.glossIt, person)}`
+    const form = past ? pastIt(verb.glossIt, person) : conjugateIt(verb.glossIt, person)
+    return `${IT_PRONOUNS[person]} ${form}`
   }
   const base = verb.gloss.replace(/^to /, '').replace(/\s*\(.*\)$/, '')
+  if (past) return `${EN_PRONOUNS[person]} ${pastEn(base)}`
   const form = base === 'be' ? EN_BE[person] : person === '3sg' ? verb.gloss3sg : base
   return `${EN_PRONOUNS[person]} ${form}`
 }

@@ -697,6 +697,7 @@ export const ES_U2_TOPICS: Topic[] = [
             options: [
               { text: 'eres' },
               { text: 'estás', strategy: 'serEstarSwap' },
+              { text: 'es', strategy: 'wrongPerson' },
             ],
             skillIds: ['es-ser-vs-estar:core'],
             ttsText: 'Tú eres alto.',
@@ -728,6 +729,7 @@ export const ES_U2_TOPICS: Topic[] = [
             options: [
               { text: 'es' },
               { text: 'está', strategy: 'serEstarSwap' },
+              { text: 'son', strategy: 'wrongPerson' },
             ],
             skillIds: ['es-ser-vs-estar:core'],
             ttsText: 'Mi amigo es de la ciudad.',

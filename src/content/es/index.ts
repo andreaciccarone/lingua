@@ -1,6 +1,10 @@
 import type { Topic, Unit } from '../types'
 import { ES_U1_TOPICS } from './units/u1'
 import { ES_U2_TOPICS } from './units/u2'
+import { ES_U3_TOPICS } from './units/u3'
+import { ES_U4_TOPICS } from './units/u4'
+import { ES_U5_TOPICS } from './units/u5'
+import { ES_U6_TOPICS } from './units/u6'
 
 export const ES_UNITS: Unit[] = [
   {
@@ -32,15 +36,66 @@ export const ES_UNITS: Unit[] = [
     ],
     packIds: ['es-pack-food', 'es-pack-town', 'es-pack-daily'],
   },
+  {
+    id: 'es-u3',
+    lang: 'es',
+    title: 'Verbos con carácter',
+    blurb: { en: 'Irregulars and stem-changers', it: 'Verbi irregolari e con dittongazione' },
+    topicIds: [
+      'es-tener-venir',
+      'es-ir-future',
+      'es-go-verbs',
+      'es-stem-e-ie',
+      'es-stem-o-ue-e-i',
+      'es-saber-conocer',
+    ],
+    packIds: ['es-pack-house', 'es-pack-actions'],
+  },
+  {
+    id: 'es-u4',
+    lang: 'es',
+    title: 'La gente y las cosas',
+    blurb: {
+      en: 'Possessives, object pronouns and gustar',
+      it: 'Possessivi, pronomi oggetto e gustar',
+    },
+    topicIds: [
+      'es-possessives',
+      'es-demonstratives',
+      'es-personal-a',
+      'es-dop',
+      'es-iop',
+      'es-gustar',
+    ],
+    packIds: ['es-pack-clothes', 'es-pack-describe2'],
+  },
+  {
+    id: 'es-u5',
+    lang: 'es',
+    title: 'Mi día',
+    blurb: { en: 'Reflexives, routines and comparisons', it: 'Riflessivi, routine e comparativi' },
+    topicIds: ['es-reflexives', 'es-progressive', 'es-obligation', 'es-comparatives'],
+    packIds: ['es-pack-routine'],
+  },
+  {
+    id: 'es-u6',
+    lang: 'es',
+    title: 'Ayer',
+    blurb: { en: 'The past tense', it: 'Il passato' },
+    topicIds: ['es-preterite-regular', 'es-preterite-irregular', 'es-past-time'],
+    packIds: ['es-pack-travel'],
+  },
 ]
 
-export const ES_TOPICS: Topic[] = [...ES_U1_TOPICS, ...ES_U2_TOPICS]
+export const ES_TOPICS: Topic[] = [
+  ...ES_U1_TOPICS,
+  ...ES_U2_TOPICS,
+  ...ES_U3_TOPICS,
+  ...ES_U4_TOPICS,
+  ...ES_U5_TOPICS,
+  ...ES_U6_TOPICS,
+]
 export const ES_TOPIC_BY_ID = new Map(ES_TOPICS.map((t) => [t.id, t]))
 
-/** designed but not yet authored — shown greyed-out on the path */
-export const ES_UPCOMING_UNITS: { title: string; blurb: { en: string; it: string } }[] = [
-  { title: 'Verbos con carácter', blurb: { en: 'Irregulars and stem-changers', it: 'Verbi irregolari e con dittongazione' } },
-  { title: 'La gente y las cosas', blurb: { en: 'Possessives, object pronouns, gustar', it: 'Possessivi, pronomi oggetto, gustar' } },
-  { title: 'Mi día', blurb: { en: 'Reflexives, routines and comparisons', it: 'Riflessivi, routine e comparativi' } },
-  { title: 'Ayer', blurb: { en: 'The past tense', it: 'Il passato' } },
-]
+/** the Spanish A1-A2 course is fully authored — nothing upcoming */
+export const ES_UPCOMING_UNITS: { title: string; blurb: { en: string; it: string } }[] = []

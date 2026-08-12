@@ -26,6 +26,15 @@ export const ES_ADJS: AdjEntry[] = [
   { id: 'es/adj/fácil', lang: 'es', lemma: 'fácil', gloss: 'easy', glossItForms: { m: 'facile', f: 'facile', mpl: 'facili', fpl: 'facili' }, tags: ['abstract'], es: { invariable: true } },
   { id: 'es/adj/joven', lang: 'es', lemma: 'joven', gloss: 'young', glossItForms: { m: 'giovane', f: 'giovane', mpl: 'giovani', fpl: 'giovani' }, tags: ['human'], es: { invariable: true } },
   { id: 'es/adj/trabajador', lang: 'es', lemma: 'trabajador', gloss: 'hard-working', glossItForms: { m: 'lavoratore', f: 'lavoratrice', mpl: 'lavoratori', fpl: 'lavoratrici' }, tags: ['human'], es: { formsOverride: { m: 'trabajador', f: 'trabajadora', mpl: 'trabajadores', fpl: 'trabajadoras' } } },
+  { id: 'es/adj/rápido', lang: 'es', lemma: 'rápido', gloss: 'fast', glossItForms: { m: 'veloce', f: 'veloce', mpl: 'veloci', fpl: 'veloci' }, tags: ['vehicle', 'human'], es: {} },
+  { id: 'es/adj/lento', lang: 'es', lemma: 'lento', gloss: 'slow', glossItForms: { m: 'lento', f: 'lenta', mpl: 'lenti', fpl: 'lente' }, tags: ['vehicle', 'human'], es: {} },
+  { id: 'es/adj/largo', lang: 'es', lemma: 'largo', gloss: 'long', glossItForms: { m: 'lungo', f: 'lunga', mpl: 'lunghi', fpl: 'lunghe' }, tags: ['object'], es: {} },
+  { id: 'es/adj/corto', lang: 'es', lemma: 'corto', gloss: 'short (length)', glossItForms: { m: 'corto', f: 'corta', mpl: 'corti', fpl: 'corte' }, tags: ['object'], es: {} },
+  { id: 'es/adj/guapo', lang: 'es', lemma: 'guapo', gloss: 'good-looking', glossItForms: { m: 'bello', f: 'bella', mpl: 'belli', fpl: 'belle' }, tags: ['human'], es: {} },
+  { id: 'es/adj/divertido', lang: 'es', lemma: 'divertido', gloss: 'fun, funny', glossItForms: { m: 'divertente', f: 'divertente', mpl: 'divertenti', fpl: 'divertenti' }, tags: ['human'], es: {} },
+  { id: 'es/adj/aburrido', lang: 'es', lemma: 'aburrido', gloss: 'boring', glossItForms: { m: 'noioso', f: 'noiosa', mpl: 'noiosi', fpl: 'noiose' }, tags: ['human'], es: {} },
+  { id: 'es/adj/importante', lang: 'es', lemma: 'importante', gloss: 'important', glossItForms: { m: 'importante', f: 'importante', mpl: 'importanti', fpl: 'importanti' }, tags: ['abstract'], es: { invariable: true } },
+  { id: 'es/adj/moreno', lang: 'es', lemma: 'moreno', gloss: 'dark-haired', glossItForms: { m: 'moro', f: 'mora', mpl: 'mori', fpl: 'more' }, tags: ['human'], es: {} },
 ]
 
 export const ES_ADJ_BY_ID = new Map(ES_ADJS.map((a) => [a.id, a]))

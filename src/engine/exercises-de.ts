@@ -123,6 +123,17 @@ export function genCaseArticleDrill(
       strategy: 'wrongGenderArticle',
     })
   }
+  // Plural articles ignore gender (always die/den), so gender swaps collapse onto
+  // the answer. The live error there is reaching for a singular article instead.
+  if (opts.number === 'pl') {
+    for (const sg of ['m', 'f', 'n'] as const) {
+      const fake: NounEntry = { ...noun, de: { ...noun.de!, gender: sg } }
+      candidates.push({
+        text: declineDe(fake, { case: opts.case, det: opts.det, number: 'sg' }).article,
+        strategy: 'wrongNumber',
+      })
+    }
+  }
 
   const sentence = frame.tokens.map((t) => (t === '{noun}' ? nounForm : t))
   const gapIndex = sentence.indexOf('___')

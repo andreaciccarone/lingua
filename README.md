@@ -13,10 +13,14 @@ backend — all progress in on-device IndexedDB.
 
 ## What's inside
 
-- **Curriculum:** Spanish A1 units 1–2 (11 topics) and German A1 units 1–2 (12 topics), each with
-  explanations, paradigm tables, and drills; 11 thematic vocab packs (~120 words per language so far).
-- **Engines:** Spanish conjugator (regular/irregular/stem-changing) + article/plural/adjective
-  agreement; German conjugator (vowel change, e-insertion, s-merge, separable prefixes, perfect) +
+- **Curriculum:** the complete Spanish A1→A2 course — 6 units, 30 topics, from noun gender to the
+  preterite — plus German units 1–2 (12 topics). Every topic has an explanation, paradigm tables,
+  worked examples and generated drills. 17 thematic vocab packs (Spanish lexicon: 58 verbs,
+  101 nouns, 34 adjectives).
+- **Engines:** Spanish conjugator — present and preterite, with stem changes (quiero, pido),
+  yo-irregulars (hago, salgo), spelling rules (busqué, llegué, leyó), 3rd-person preterite shifts
+  (pidió, durmió), strong preterites (fui, hice, dije) and reflexives (me levanto) — plus
+  article/plural/adjective agreement; German conjugator (vowel change, e-insertion, s-merge, separable prefixes, perfect) +
   full case decliner (der/ein/kein/possessive × nom/acc/dat, n-declension, dative-plural -n).
   The same engines render the explanation tables and generate the drills, so they can never disagree.
 - **SRS:** SM-2-lite with automatic grading; the card is a grammar *skill* (e.g. "tú-form of -ar
@@ -55,8 +59,22 @@ Push to `main` → GitHub Actions builds and deploys to GitHub Pages. That's it.
 - **Voices:** if speaker buttons are missing, install voices under iOS Settings → Accessibility →
   Spoken Content → Voices (Mónica/Paulina for Spanish, Anna/Helena for German work well).
 
+## Language
+
+The app is bilingual in its *instruction* language: Italian by default, English on a toggle in
+Settings. Explanations, glosses, hints and UI are all localized; generated exercise prompts are
+rendered by a small Italian morphology layer (`src/i18n/gloss-it.ts`) that conjugates gloss verbs,
+including the passato prossimo used for Spanish preterite drills.
+
+## Content invariants
+
+`src/content/content.test.ts` is a build-time validator over all authored content: dependency
+ordering on the path, every drilled cell declared, every lexeme id resolvable, authored exercises
+well formed (one correct option, ≥3 options, unambiguous match boards), every skill regenerating a
+review exercise, and every topic building a playable lesson in both instruction languages. Adding
+content without satisfying these fails `npm test`, and therefore the deploy.
+
 ## Roadmap
 
-- Spanish/German units 3–6 (the curriculum design covers A1→A2: preterite, dative, perfect,
-  subordinate clauses…)
+- German units 3–6 (modal verbs, dative, Perfekt, subordinate clauses)
 - Dark mode, error-spotting exercise type, review-forecast chart, test-out quizzes for topics.

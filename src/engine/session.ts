@@ -325,7 +325,7 @@ async function buildPackSession(packId: string): Promise<SessionSpec | null> {
 
 // ---------- review generation: a due skill gets a freshly generated exercise ----------
 
-function reviewExerciseForSkill(
+export function reviewExerciseForSkill(
   card: CardRecord,
   seed: string,
   primary: PrimaryLang,
