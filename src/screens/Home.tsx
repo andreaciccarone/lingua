@@ -1,14 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
-import { Flame, Lock } from 'lucide-react'
+import { BookA, Check, Flame, Lock } from 'lucide-react'
+import { ES_TOPIC_BY_ID, ES_UNITS } from '../content/es'
+import { ES_PACKS } from '../content/es/packs'
+import { getAllLessons } from '../data/db'
 
-const UNITS: Record<'es' | 'de', string[]> = {
-  es: ['Primeros pasos', 'El presente', 'Verbos con carácter', 'La gente y las cosas', 'Mi día', 'Ayer'],
-  de: ['Erste Schritte', 'Sätze bauen', 'Modal & Co', 'Der Dativ', 'Vergangenheit', 'Komplexe Sätze'],
-}
+const DE_UNITS = [
+  'Erste Schritte',
+  'Sätze bauen',
+  'Modal & Co',
+  'Der Dativ',
+  'Vergangenheit',
+  'Komplexe Sätze',
+]
 
 export default function Home() {
   const [lang, setLang] = useState<'es' | 'de'>('es')
+  const [completed, setCompleted] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    getAllLessons().then((all) =>
+      setCompleted(new Set(all.map((l) => l.lessonId.split('/')[0]))),
+    )
+  }, [])
+
+  const isTopicUnlocked = (topicId: string): boolean => {
+    const topic = ES_TOPIC_BY_ID.get(topicId)
+    if (!topic) return false
+    return topic.dependencies.every((dep) => completed.has(dep))
+  }
 
   return (
     <div className="pt-4">
@@ -34,54 +54,108 @@ export default function Home() {
         ))}
       </div>
 
-      {lang === 'es' && (
-        <Link
-          href="/lesson/vocab-basics"
-          className="mb-3 flex items-center justify-between rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm"
-        >
-          <div>
-            <p className="text-xs font-medium text-emerald-500">Word pack</p>
-            <p className="font-semibold">First words</p>
-          </div>
-          <span className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow">
-            Learn words
-          </span>
-        </Link>
-      )}
-
-      <ol className="space-y-3">
-        {UNITS[lang].map((title, i) => (
-          <li
-            key={title}
-            className={`flex items-center justify-between rounded-2xl border p-4 ${
-              i === 0 ? 'border-indigo-200 bg-white shadow-sm' : 'border-slate-200 bg-slate-100'
-            }`}
-          >
-            <div>
-              <p className="text-xs font-medium text-slate-400">Unit {i + 1}</p>
-              <p className={`font-semibold ${i === 0 ? 'text-slate-900' : 'text-slate-400'}`}>
-                {title}
+      {lang === 'de' ? (
+        <ol className="space-y-3">
+          {DE_UNITS.map((title, i) => (
+            <li
+              key={title}
+              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-100 p-4"
+            >
+              <div>
+                <p className="text-xs font-medium text-slate-400">Unit {i + 1}</p>
+                <p className="font-semibold text-slate-400">{title}</p>
+              </div>
+              <span className="text-xs font-semibold text-slate-400">Coming soon</span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className="space-y-8">
+          {ES_UNITS.map((unit, ui) => (
+            <section key={unit.id}>
+              <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
+                Unit {ui + 1} · {unit.title}
               </p>
-            </div>
-            {i === 0 ? (
-              lang === 'es' ? (
-                <Link
-                  href="/lesson/demo"
-                  className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow"
-                >
-                  Try a lesson
-                </Link>
-              ) : (
-                <span className="rounded-full bg-slate-300 px-3 py-1 text-xs font-semibold text-white">
-                  Coming soon
-                </span>
-              )
-            ) : (
-              <Lock size={18} className="text-slate-300" />
-            )}
-          </li>
-        ))}
-      </ol>
+              <p className="mb-3 text-sm text-slate-500">{unit.blurb}</p>
+              <ol className="space-y-2">
+                {unit.topicIds.map((tid) => {
+                  const topic = ES_TOPIC_BY_ID.get(tid)
+                  if (!topic) return null
+                  const done = completed.has(tid)
+                  const unlocked = isTopicUnlocked(tid)
+                  const row = (
+                    <li
+                      className={`flex items-center justify-between rounded-2xl border p-4 ${
+                        done
+                          ? 'border-emerald-200 bg-emerald-50'
+                          : unlocked
+                            ? 'border-indigo-200 bg-white shadow-sm'
+                            : 'border-slate-200 bg-slate-100'
+                      }`}
+                    >
+                      <div className="min-w-0 pr-3">
+                        <p
+                          className={`truncate font-semibold ${
+                            unlocked || done ? 'text-slate-900' : 'text-slate-400'
+                          }`}
+                        >
+                          {topic.title}
+                        </p>
+                        <p className="truncate text-xs text-slate-400">{topic.ruleSummary}</p>
+                      </div>
+                      {done ? (
+                        <Check size={18} className="shrink-0 text-emerald-500" />
+                      ) : unlocked ? (
+                        <span className="shrink-0 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                          Learn
+                        </span>
+                      ) : (
+                        <Lock size={16} className="shrink-0 text-slate-300" />
+                      )}
+                    </li>
+                  )
+                  return unlocked || done ? (
+                    <Link key={tid} href={`/topic/${tid}`} className="block">
+                      {row}
+                    </Link>
+                  ) : (
+                    <div key={tid}>{row}</div>
+                  )
+                })}
+                {unit.packIds.map((pid) => {
+                  const pack = ES_PACKS.find((p) => p.id === pid)
+                  if (!pack) return null
+                  const done = completed.has(pid)
+                  return (
+                    <Link key={pid} href={`/lesson/pack:${pid}`} className="block">
+                      <li
+                        className={`flex items-center justify-between rounded-2xl border p-4 ${
+                          done ? 'border-emerald-200 bg-emerald-50' : 'border-emerald-200 bg-white shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <BookA size={16} className="text-emerald-500" />
+                          <div>
+                            <p className="text-xs font-medium text-emerald-500">Word pack</p>
+                            <p className="font-semibold">{pack.title}</p>
+                          </div>
+                        </div>
+                        {done ? (
+                          <Check size={18} className="text-emerald-500" />
+                        ) : (
+                          <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                            Words
+                          </span>
+                        )}
+                      </li>
+                    </Link>
+                  )
+                })}
+              </ol>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

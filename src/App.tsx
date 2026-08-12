@@ -7,6 +7,7 @@ import Review from './screens/Review'
 import Stats from './screens/Stats'
 import Settings from './screens/Settings'
 import Lesson from './screens/Lesson'
+import TopicIntro from './screens/TopicIntro'
 import InstallHint from './components/InstallHint'
 import UpdateToast from './components/UpdateToast'
 
@@ -58,8 +59,9 @@ export default function App() {
   return (
     <Router hook={useHashLocation}>
       <Switch>
-        {/* lessons run fullscreen, outside the tab shell */}
+        {/* lessons and topic intros run fullscreen, outside the tab shell */}
         <Route path="/lesson/:id" component={Lesson} />
+        <Route path="/topic/:id" component={TopicIntro} />
         <Route>
           <TabShell />
         </Route>

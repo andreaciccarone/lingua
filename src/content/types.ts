@@ -133,7 +133,9 @@ export interface Topic {
   dependencies: string[] // topic ids
   explanation: ExplanationBlock[]
   skillCells: SkillCellDef[]
-  drill: DrillConfig
+  /** words introduced as flashcards before the drill */
+  introLexemeIds: string[]
+  drillItems: DrillSpec[]
   errorHints: Partial<Record<DistractorStrategy, string>>
 }
 
@@ -180,15 +182,14 @@ export type DistractorStrategy =
   | 'gustarNumberSwap'
   | 'vocabConfusable'
 
-export interface GeneratorRecipe {
-  generator: 'conjugation' | 'declension' | 'template'
-  params: Record<string, unknown>
-}
-
-export interface DrillConfig {
-  recipes: GeneratorRecipe[]
-  typeWeights: Partial<Record<ExerciseType, number>>
-}
+/** Concrete, typed drill recipes. A topic's lesson expands these in order. */
+export type DrillSpec =
+  | { gen: 'match-verb'; verbId: string; tense: TenseKey }
+  | { gen: 'conj'; verbId: string; tense: TenseKey; persons: PersonKey[]; type: 'mc' | 'cloze' }
+  | { gen: 'article'; nounIds: string[]; count: number; def: boolean; number: 'sg' | 'pl' | 'mix' }
+  | { gen: 'plural'; nounIds: string[]; count: number }
+  | { gen: 'adj-agree'; pairs: [adjId: string, nounId: string][]; count: number }
+  | { gen: 'authored'; exercises: ExerciseInstance[] }
 
 /** A skill is the SRS unit: "topicId:cellId" for grammar, "lang/vocab/lemma:side" for words. */
 export type SkillId = string
@@ -229,14 +230,3 @@ export interface AuthoredExercise {
   hint?: string // overrides topic errorHints when set
 }
 
-export interface Lesson {
-  id: string // "es-present-ar/l1"
-  topicId: string
-  /** new words introduced before the drill */
-  introLexemeIds: string[]
-  items: LessonItem[]
-}
-
-export type LessonItem =
-  | { kind: 'static'; exerciseId: string }
-  | { kind: 'generated'; recipe: GeneratorRecipe }

@@ -1,7 +1,7 @@
-import type { ExerciseInstance, NounEntry, VerbEntry } from '../content/types'
+import type { AdjEntry, ExerciseInstance, NounEntry, VerbEntry } from '../content/types'
 import { hashSeed, mulberry32, pick, shuffled } from './exercises'
 
-export type VocabLexeme = VerbEntry | NounEntry
+export type VocabLexeme = VerbEntry | NounEntry | AdjEntry
 
 function isNoun(l: VocabLexeme): l is NounEntry {
   return l.id.includes('/noun/')

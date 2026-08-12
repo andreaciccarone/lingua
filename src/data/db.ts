@@ -94,6 +94,10 @@ export async function getLesson(lessonId: string): Promise<LessonRecord | undefi
   return (await getDB()).get('lessons', lessonId)
 }
 
+export async function getAllLessons(): Promise<LessonRecord[]> {
+  return (await getDB()).getAll('lessons')
+}
+
 export async function recordLesson(lessonId: string, score: number): Promise<void> {
   const db = await getDB()
   const prev = await db.get('lessons', lessonId)
