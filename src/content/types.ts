@@ -74,7 +74,8 @@ export interface NounEntry {
   gloss: string
   glossPlural?: string
   tags: SemTag[]
-  es?: { gender: 'm' | 'f'; pluralIrregular?: string }
+  /** singularArticle: feminine nouns with stressed initial /a/ take "el" (el agua) */
+  es?: { gender: 'm' | 'f'; pluralIrregular?: string; singularArticle?: 'el' | 'la' }
   de?: { gender: GermanGender; plural: string; nDeclension?: boolean }
 }
 

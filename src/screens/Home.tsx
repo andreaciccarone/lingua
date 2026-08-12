@@ -34,6 +34,21 @@ export default function Home() {
         ))}
       </div>
 
+      {lang === 'es' && (
+        <Link
+          href="/lesson/vocab-basics"
+          className="mb-3 flex items-center justify-between rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm"
+        >
+          <div>
+            <p className="text-xs font-medium text-emerald-500">Word pack</p>
+            <p className="font-semibold">First words</p>
+          </div>
+          <span className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow">
+            Learn words
+          </span>
+        </Link>
+      )}
+
       <ol className="space-y-3">
         {UNITS[lang].map((title, i) => (
           <li

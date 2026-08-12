@@ -1,53 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Link, useLocation } from 'wouter'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useLocation, useParams } from 'wouter'
 import { X } from 'lucide-react'
-import type { DistractorStrategy, ExerciseInstance, ExerciseOption } from '../content/types'
+import type { ExerciseOption } from '../content/types'
 import type { GradeResult } from '../engine/grading'
-import { genConjugationDrill, genMatchDrill } from '../engine/exercises'
-import { ES_VERB_BY_ID } from '../content/es/morphology/verbs'
+import { buildSession, metaForSkill, type SessionSpec } from '../engine/session'
+import { finishSession, recordAnswer } from '../data/progress'
 import MultipleChoice from '../components/exercises/MultipleChoice'
 import Cloze from '../components/exercises/Cloze'
 import MatchPairs from '../components/exercises/MatchPairs'
-
-// M2 demo lesson: ser + hablar present. Real lessons arrive with M4 content.
-const DEMO_HINTS: Partial<Record<DistractorStrategy, string>> = {
-  wrongPerson: 'The verb ending must match the person: tú → -as, él/ella → -a.',
-  wrongClass: 'hablar is an -ar verb — its endings use a (-as, -a, -amos), not e.',
-  infinitive: 'That is the unconjugated form. Spanish verbs always agree with their subject.',
-  missingStemChange: 'This verb changes its stem vowel in this form.',
-  overStemChange: 'nosotros and vosotros keep the original stem.',
-}
-
-function buildDemoLesson(): ExerciseInstance[] {
-  const ser = ES_VERB_BY_ID.get('es/verb/ser')!
-  const hablar = ES_VERB_BY_ID.get('es/verb/hablar')!
-  const day = new Date().toISOString().slice(0, 10)
-  const items: ExerciseInstance[] = [
-    genMatchDrill({ verb: ser, tense: 'pres', topicId: 'es-ser-present', seed: `${day}/m1` }),
-    ...(['2sg', '3sg', '1pl'] as const).map((person) =>
-      genConjugationDrill({
-        verb: ser, tense: 'pres', person, topicId: 'es-ser-present', type: 'mc', seed: `${day}/ser/${person}`,
-      }),
-    ),
-    ...(['1sg', '3pl'] as const).map((person) =>
-      genConjugationDrill({
-        verb: ser, tense: 'pres', person, topicId: 'es-ser-present', type: 'cloze', seed: `${day}/serc/${person}`,
-      }),
-    ),
-    genMatchDrill({ verb: hablar, tense: 'pres', topicId: 'es-present-ar', seed: `${day}/m2` }),
-    ...(['3sg', '1pl'] as const).map((person) =>
-      genConjugationDrill({
-        verb: hablar, tense: 'pres', person, topicId: 'es-present-ar', type: 'mc', seed: `${day}/hab/${person}`,
-      }),
-    ),
-    ...(['2sg', '3pl'] as const).map((person) =>
-      genConjugationDrill({
-        verb: hablar, tense: 'pres', person, topicId: 'es-present-ar', type: 'cloze', seed: `${day}/habc/${person}`,
-      }),
-    ),
-  ]
-  return items
-}
+import Flashcard from '../components/exercises/Flashcard'
 
 interface Feedback {
   correct: boolean
@@ -55,17 +16,48 @@ interface Feedback {
 }
 
 export default function Lesson() {
+  const params = useParams<{ id: string }>()
   const [, navigate] = useLocation()
-  const exercises = useMemo(buildDemoLesson, [])
+  const [spec, setSpec] = useState<SessionSpec | null>(null)
+  const [missing, setMissing] = useState(false)
   const [index, setIndex] = useState(0)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [firstTryCorrect, setFirstTryCorrect] = useState(0)
-  const [done, setDone] = useState(false)
+  const [earnedXp, setEarnedXp] = useState<number | null>(null)
+  const [finishing, setFinishing] = useState(false)
+  const startedAt = useRef(Date.now())
 
-  const exercise = exercises[index]
-  const progress = (index / exercises.length) * 100
+  useEffect(() => {
+    let cancelled = false
+    buildSession(params.id).then((s) => {
+      if (cancelled) return
+      if (!s || s.exercises.length === 0) setMissing(true)
+      else setSpec(s)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [params.id])
+
+  const exercise = spec?.exercises[index]
+  useMemo(() => {
+    startedAt.current = Date.now()
+  }, [index])
+
+  function record(correct: boolean) {
+    if (!exercise) return
+    const primary = exercise.skillIds[0]
+    if (!primary) return
+    void recordAnswer(primary, metaForSkill(primary), {
+      firstTry: correct,
+      secondTry: false,
+      ms: Date.now() - startedAt.current,
+    })
+  }
 
   function handleAnswer(correct: boolean, option?: ExerciseOption, gradeResult?: GradeResult) {
+    if (!spec || !exercise) return
+    record(correct)
     if (correct) {
       setFirstTryCorrect((n) => n + 1)
       const note =
@@ -78,34 +70,75 @@ export default function Lesson() {
               : undefined
       setFeedback({ correct: true, message: note })
     } else {
-      const hint = option?.strategy ? DEMO_HINTS[option.strategy] : undefined
-      setFeedback({
-        correct: false,
-        message: `${exercise.answer}${hint ? ` — ${hint}` : ''}`,
-      })
+      const hint = option?.strategy ? spec.hints[option.strategy] : undefined
+      setFeedback({ correct: false, message: `${exercise.answer}${hint ? ` — ${hint}` : ''}` })
     }
   }
 
   function handleMatchComplete(wrongTaps: number) {
+    if (!exercise) return
+    // every pair in the board shares the outcome; misses make it a 'hard' review
+    for (const skillId of exercise.skillIds) {
+      void recordAnswer(skillId, metaForSkill(skillId), {
+        firstTry: wrongTaps === 0,
+        secondTry: wrongTaps > 0,
+      })
+    }
     if (wrongTaps === 0) setFirstTryCorrect((n) => n + 1)
-    setFeedback({ correct: wrongTaps === 0, message: wrongTaps ? 'Cleared with some misses.' : undefined })
+    setFeedback({
+      correct: wrongTaps === 0,
+      message: wrongTaps ? 'Cleared with some misses.' : undefined,
+    })
+  }
+
+  function handleFlashcardDone() {
+    if (!exercise) return
+    record(true)
+    next()
   }
 
   function next() {
+    if (!spec) return
     setFeedback(null)
-    if (index + 1 >= exercises.length) setDone(true)
-    else setIndex(index + 1)
+    if (index + 1 >= spec.exercises.length) {
+      setFinishing(true)
+      void finishSession({
+        lessonId: spec.lessonId,
+        firstTryCorrect,
+        total: spec.exercises.length,
+        isReview: spec.isReview,
+      }).then(({ xp }) => setEarnedXp(xp))
+    } else {
+      setIndex(index + 1)
+    }
   }
 
-  if (done) {
-    const pct = Math.round((firstTryCorrect / exercises.length) * 100)
+  if (missing) {
+    return (
+      <Empty
+        title="Nothing here"
+        body="This session is empty — nothing is due right now."
+        onDone={() => navigate('/')}
+      />
+    )
+  }
+
+  if (!spec || !exercise || (finishing && earnedXp === null)) {
+    return <div className="flex min-h-dvh items-center justify-center text-slate-400">Loading…</div>
+  }
+
+  if (earnedXp !== null) {
+    const pct = Math.round((firstTryCorrect / spec.exercises.length) * 100)
     return (
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-6 pt-safe pb-safe">
         <p className="text-6xl">{pct >= 80 ? '🎉' : pct >= 50 ? '💪' : '📖'}</p>
-        <h1 className="mt-4 text-2xl font-bold">Lesson complete</h1>
+        <h1 className="mt-4 text-2xl font-bold">
+          {spec.isReview ? 'Review complete' : 'Lesson complete'}
+        </h1>
         <p className="mt-2 text-slate-500">
-          {firstTryCorrect} of {exercises.length} right on the first try ({pct}%)
+          {firstTryCorrect} of {spec.exercises.length} right on the first try ({pct}%)
         </p>
+        <p className="mt-1 font-semibold text-amber-600">+{earnedXp} XP</p>
         <button
           onClick={() => navigate('/')}
           className="mt-8 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow"
@@ -115,6 +148,8 @@ export default function Lesson() {
       </div>
     )
   }
+
+  const progress = (index / spec.exercises.length) * 100
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col px-4 pt-safe">
@@ -131,7 +166,9 @@ export default function Lesson() {
       </header>
 
       <main className="flex-1 pb-44">
-        {exercise.type === 'match' ? (
+        {exercise.type === 'flashcard' ? (
+          <Flashcard key={index} exercise={exercise} onComplete={handleFlashcardDone} />
+        ) : exercise.type === 'match' ? (
           <MatchPairs key={index} exercise={exercise} onComplete={handleMatchComplete} />
         ) : exercise.type === 'mc' ? (
           <MultipleChoice
@@ -157,9 +194,7 @@ export default function Lesson() {
           }`}
         >
           <div className="mx-auto max-w-lg px-4 py-4">
-            <p
-              className={`font-bold ${feedback.correct ? 'text-emerald-800' : 'text-rose-800'}`}
-            >
+            <p className={`font-bold ${feedback.correct ? 'text-emerald-800' : 'text-rose-800'}`}>
               {feedback.correct ? 'Correct!' : 'Not quite.'}
             </p>
             {feedback.message && (
@@ -180,6 +215,21 @@ export default function Lesson() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function Empty({ title, body, onDone }: { title: string; body: string; onDone: () => void }) {
+  return (
+    <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-6">
+      <h1 className="text-xl font-bold">{title}</h1>
+      <p className="mt-2 text-center text-slate-500">{body}</p>
+      <button
+        onClick={onDone}
+        className="mt-8 w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow"
+      >
+        Back
+      </button>
     </div>
   )
 }
