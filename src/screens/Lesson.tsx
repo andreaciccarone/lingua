@@ -9,6 +9,7 @@ import MultipleChoice from '../components/exercises/MultipleChoice'
 import Cloze from '../components/exercises/Cloze'
 import MatchPairs from '../components/exercises/MatchPairs'
 import Flashcard from '../components/exercises/Flashcard'
+import SpeakButton from '../components/SpeakButton'
 
 interface Feedback {
   correct: boolean
@@ -170,13 +171,19 @@ export default function Lesson() {
           <Flashcard key={index} exercise={exercise} onComplete={handleFlashcardDone} />
         ) : exercise.type === 'match' ? (
           <MatchPairs key={index} exercise={exercise} onComplete={handleMatchComplete} />
-        ) : exercise.type === 'mc' ? (
-          <MultipleChoice
-            key={index}
-            exercise={exercise}
-            disabled={!!feedback}
-            onAnswer={(correct, option) => handleAnswer(correct, option)}
-          />
+        ) : exercise.type === 'mc' || exercise.type === 'listen-cloze' ? (
+          <div key={index}>
+            {exercise.type === 'listen-cloze' && exercise.ttsText && (
+              <div className="mt-10 flex justify-center rounded-2xl border border-indigo-100 bg-indigo-50 py-6">
+                <SpeakButton text={exercise.ttsText} lang={exercise.lang} size={36} autoPlay />
+              </div>
+            )}
+            <MultipleChoice
+              exercise={exercise}
+              disabled={!!feedback}
+              onAnswer={(correct, option) => handleAnswer(correct, option)}
+            />
+          </div>
         ) : (
           <Cloze
             key={index}
@@ -194,9 +201,14 @@ export default function Lesson() {
           }`}
         >
           <div className="mx-auto max-w-lg px-4 py-4">
-            <p className={`font-bold ${feedback.correct ? 'text-emerald-800' : 'text-rose-800'}`}>
-              {feedback.correct ? 'Correct!' : 'Not quite.'}
-            </p>
+            <div className="flex items-center justify-between">
+              <p className={`font-bold ${feedback.correct ? 'text-emerald-800' : 'text-rose-800'}`}>
+                {feedback.correct ? 'Correct!' : 'Not quite.'}
+              </p>
+              {exercise.ttsText && exercise.type !== 'listen-cloze' && (
+                <SpeakButton text={exercise.ttsText} lang={exercise.lang} size={18} autoPlay />
+              )}
+            </div>
             {feedback.message && (
               <p
                 className={`mt-1 text-sm ${feedback.correct ? 'text-emerald-700' : 'text-rose-700'}`}

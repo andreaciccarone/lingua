@@ -82,6 +82,33 @@ export function genVocabProduction(l: VocabLexeme, seed: string): ExerciseInstan
   }
 }
 
+/** listening: hear the word, pick the written form (sound → spelling) */
+export function genVocabListening(
+  l: VocabLexeme,
+  pool: VocabLexeme[],
+  seed: string,
+): ExerciseInstance {
+  const rand = mulberry32(hashSeed(seed))
+  const target = displayForm(l)
+  const distractors = shuffled(
+    pool.filter((p) => p.id !== l.id && displayForm(p) !== target),
+    rand,
+  )
+    .slice(0, 3)
+    .map((p) => ({ text: displayForm(p), strategy: 'vocabConfusable' as const }))
+  return {
+    type: 'listen-cloze',
+    lang: l.lang,
+    sentence: [],
+    gloss: 'What do you hear?',
+    answer: target,
+    accepted: [],
+    options: shuffled([{ text: target }, ...distractors], rand),
+    skillIds: [vocabSkillId(l, 'recog')],
+    ttsText: target,
+  }
+}
+
 /** pack-start warmup: match words to meanings */
 export function genVocabMatch(lexemes: VocabLexeme[], seed: string): ExerciseInstance {
   const rand = mulberry32(hashSeed(seed))

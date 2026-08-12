@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
-import type { ExplanationBlock } from '../content/types'
+import type { ExplanationBlock, Lang } from '../content/types'
+import SpeakButton from './SpeakButton'
 
 /** minimal inline markdown: **bold** and *italic* */
 export function mdInline(text: string): ReactNode[] {
@@ -11,7 +12,7 @@ export function mdInline(text: string): ReactNode[] {
   })
 }
 
-export default function Explanation({ blocks }: { blocks: ExplanationBlock[] }) {
+export default function Explanation({ blocks, lang }: { blocks: ExplanationBlock[]; lang: Lang }) {
   return (
     <div className="space-y-5">
       {blocks.map((block, i) => {
@@ -65,12 +66,18 @@ export default function Explanation({ blocks }: { blocks: ExplanationBlock[] }) 
           }
           case 'example':
             return (
-              <div key={i} className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                <p className="font-semibold text-indigo-800">{block.text}</p>
-                <p className="text-sm text-slate-500">
-                  {block.gloss}
-                  {block.note && <span className="text-slate-400"> · {block.note}</span>}
-                </p>
+              <div
+                key={i}
+                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+              >
+                <div>
+                  <p className="font-semibold text-indigo-800">{block.text}</p>
+                  <p className="text-sm text-slate-500">
+                    {block.gloss}
+                    {block.note && <span className="text-slate-400"> · {block.note}</span>}
+                  </p>
+                </div>
+                <SpeakButton text={block.text} lang={lang} />
               </div>
             )
           case 'callout':

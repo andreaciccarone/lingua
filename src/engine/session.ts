@@ -15,7 +15,15 @@ import type { CardMeta } from '../data/progress'
 import { todayLocal } from '../lib/dates'
 import { genConjugationDrill, genMatchDrill, hashSeed, mulberry32, shuffled } from './exercises'
 import { genAdjAgreeDrill, genArticleDrill, genPluralDrill } from './exercises-es'
-import { genFlashcard, genVocabMatch, genVocabProduction, genVocabRecognition } from './vocab'
+import {
+  genFlashcard,
+  genVocabListening,
+  genVocabMatch,
+  genVocabProduction,
+  genVocabRecognition,
+} from './vocab'
+import { hasVoice } from '../audio/tts'
+import { getSettings } from '../data/db'
 
 export interface SessionSpec {
   id: string
@@ -163,10 +171,16 @@ async function buildPackSession(packId: string): Promise<SessionSpec | null> {
   }
   const pool = fresh.length >= 4 ? fresh : lexemes
 
+  const settings = await getSettings()
+  const listening = settings.listeningEnabled && (await hasVoice('es'))
+
   const exercises: ExerciseInstance[] = [
     ...fresh.map((l) => genFlashcard(l)),
     genVocabMatch(pool, `${day}/${packId}/vm`),
     ...pool.slice(0, 4).map((l, i) => genVocabRecognition(l, lexemes, `${day}/${packId}/vr/${i}`)),
+    ...(listening
+      ? pool.slice(0, 2).map((l, i) => genVocabListening(l, lexemes, `${day}/${packId}/vl/${i}`))
+      : []),
     ...pool.slice(0, 3).map((l, i) => genVocabProduction(l, `${day}/${packId}/vp/${i}`)),
   ]
   return {

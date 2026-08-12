@@ -31,7 +31,7 @@ export default function TopicIntro() {
       </header>
 
       <main className="flex-1 pb-32">
-        <Explanation blocks={topic.explanation} />
+        <Explanation blocks={topic.explanation} lang={topic.lang} />
       </main>
 
       <div className="fixed inset-x-0 bottom-0 bg-gradient-to-t from-slate-50 via-slate-50 pb-safe">

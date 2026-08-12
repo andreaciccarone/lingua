@@ -4,6 +4,7 @@ import { useHashLocation } from 'wouter/use-hash-location'
 import { House, RotateCcw, ChartColumn, Settings as SettingsIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useSettings } from './store/settings'
+import { primeTTS } from './audio/tts'
 import Home from './screens/Home'
 import Review from './screens/Review'
 import Stats from './screens/Stats'
@@ -61,6 +62,9 @@ export default function App() {
   const loadSettings = useSettings((s) => s.load)
   useEffect(() => {
     void loadSettings()
+    // iOS allows speech only after a user gesture — prime on the first tap
+    document.addEventListener('pointerdown', primeTTS, { once: true, capture: true })
+    return () => document.removeEventListener('pointerdown', primeTTS, { capture: true })
   }, [loadSettings])
 
   return (
