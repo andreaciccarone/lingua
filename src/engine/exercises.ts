@@ -1,0 +1,239 @@
+import type {
+  DistractorStrategy,
+  ExerciseInstance,
+  ExerciseOption,
+  PersonKey,
+  SpanishVerbClass,
+  TenseKey,
+  VerbEntry,
+} from '../content/types'
+import { PERSONS } from '../content/types'
+import { conjugateEs, ES_ENDINGS, paradigmEs } from './conjugator/es'
+
+// ---------- seeded RNG: sessions are reproducible given (date, skill) ----------
+
+export function hashSeed(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+
+export function mulberry32(seed: number): () => number {
+  let a = seed
+  return () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+export function shuffled<T>(arr: readonly T[], rand: () => number): T[] {
+  const out = [...arr]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
+export function pick<T>(arr: readonly T[], rand: () => number): T {
+  return arr[Math.floor(rand() * arr.length)]
+}
+
+// ---------- Spanish subject pronouns ----------
+
+const PRONOUNS: Record<PersonKey, string[]> = {
+  '1sg': ['yo'],
+  '2sg': ['tú'],
+  '3sg': ['él', 'ella'],
+  '1pl': ['nosotros', 'nosotras'],
+  '2pl': ['vosotros', 'vosotras'],
+  '3pl': ['ellos', 'ellas'],
+}
+
+const PRONOUN_GLOSS: Record<PersonKey, string> = {
+  '1sg': 'I',
+  '2sg': 'you',
+  '3sg': 'he/she',
+  '1pl': 'we',
+  '2pl': 'you all',
+  '3pl': 'they',
+}
+
+const BE_FORMS: Record<PersonKey, string> = {
+  '1sg': 'am',
+  '2sg': 'are',
+  '3sg': 'is',
+  '1pl': 'are',
+  '2pl': 'are',
+  '3pl': 'are',
+}
+
+/** "to be (identity)" + 2sg -> "you are"; "to speak" + 3sg -> "he/she speaks" */
+function englishGloss(verb: VerbEntry, person: PersonKey): string {
+  const base = verb.gloss.replace(/^to /, '').replace(/\s*\(.*\)$/, '')
+  const form = base === 'be' ? BE_FORMS[person] : person === '3sg' ? verb.gloss3sg : base
+  return `${PRONOUN_GLOSS[person]} ${form}`
+}
+
+// ---------- diagnostic distractors for conjugation ----------
+
+interface Candidate {
+  text: string
+  strategy: DistractorStrategy
+}
+
+function conjugationCandidates(verb: VerbEntry, tense: TenseKey, person: PersonKey): Candidate[] {
+  const es = verb.es
+  if (!es) return []
+  const out: Candidate[] = []
+
+  // wrongPerson: valid forms of other persons — wrong given the pronoun in the prompt
+  for (const p of PERSONS) {
+    if (p === person) continue
+    out.push({ text: conjugateEs(verb, tense, p).form, strategy: 'wrongPerson' })
+  }
+
+  // wrongClass: endings of the other conjugation classes on this stem
+  const stem = verb.lemma.slice(0, -2)
+  if (tense === 'pres' || tense === 'pret') {
+    for (const cls of ['ar', 'er', 'ir'] as SpanishVerbClass[]) {
+      if (cls === es.class) continue
+      out.push({
+        text: stem + ES_ENDINGS[tense][cls][PERSONS.indexOf(person)],
+        strategy: 'wrongClass',
+      })
+    }
+  }
+
+  // stem-change corruptions
+  if (es.stemChange && tense === 'pres') {
+    const ending = ES_ENDINGS.pres[es.class][PERSONS.indexOf(person)]
+    if (person === '1pl' || person === '2pl') {
+      // overStemChange: apply the changed stem where it doesn't belong (*quieremos)
+      const changedStem = conjugateEs(verb, 'pres', '2sg').form.slice(
+        0,
+        -ES_ENDINGS.pres[es.class][1].length,
+      )
+      out.push({ text: changedStem + ending, strategy: 'overStemChange' })
+    } else {
+      // missingStemChange: plain stem where the change is required (*quero)
+      out.push({ text: stem + ending, strategy: 'missingStemChange' })
+    }
+  }
+
+  out.push({ text: verb.lemma, strategy: 'infinitive' })
+  return out
+}
+
+/**
+ * Pick n distractors: unique, ≠ correct, strategy-diverse
+ * (at most 2 per strategy so one failure mode can't fill the bank).
+ */
+export function pickDistractors(
+  candidates: Candidate[],
+  correct: string,
+  n: number,
+  rand: () => number,
+): ExerciseOption[] {
+  const seen = new Set([correct.toLowerCase()])
+  const perStrategy = new Map<DistractorStrategy, number>()
+  const out: ExerciseOption[] = []
+  for (const c of shuffled(candidates, rand)) {
+    if (out.length >= n) break
+    const key = c.text.toLowerCase()
+    if (seen.has(key)) continue
+    if ((perStrategy.get(c.strategy) ?? 0) >= 2) continue
+    seen.add(key)
+    perStrategy.set(c.strategy, (perStrategy.get(c.strategy) ?? 0) + 1)
+    out.push({ text: c.text, strategy: c.strategy })
+  }
+  return out
+}
+
+// ---------- generators ----------
+
+export interface ConjugationDrillParams {
+  verb: VerbEntry
+  tense: TenseKey
+  person: PersonKey
+  topicId: string
+  type: 'mc' | 'cloze'
+  seed: string
+}
+
+export function genConjugationDrill(params: ConjugationDrillParams): ExerciseInstance {
+  const { verb, tense, person, topicId, type, seed } = params
+  const rand = mulberry32(hashSeed(seed))
+  const pronoun = pick(PRONOUNS[person], rand)
+  const { form } = conjugateEs(verb, tense, person)
+  const ending = ES_ENDINGS[tense === 'pret' ? 'pret' : 'pres'][verb.es!.class][
+    PERSONS.indexOf(person)
+  ]
+
+  const sentence = [capitalize(pronoun), '___', `(${verb.lemma})`]
+  const gloss = englishGloss(verb, person)
+
+  const base: ExerciseInstance = {
+    type,
+    lang: 'es',
+    sentence,
+    gapIndex: 1,
+    gloss,
+    answer: form,
+    accepted: [form],
+    skillIds: [`${topicId}:${person}`],
+    ttsText: `${pronoun} ${form}`,
+    strictSuffixLen: Math.min(ending.length, form.length - 1),
+  }
+
+  if (type === 'mc') {
+    const distractors = pickDistractors(
+      conjugationCandidates(verb, tense, person),
+      form,
+      3,
+      rand,
+    )
+    base.options = shuffled([{ text: form }, ...distractors], rand)
+  }
+  return base
+}
+
+export interface MatchDrillParams {
+  verb: VerbEntry
+  tense: TenseKey
+  topicId: string
+  persons?: PersonKey[]
+  seed: string
+}
+
+/** Pronoun ↔ conjugated-form matching, the paradigm warmup. */
+export function genMatchDrill(params: MatchDrillParams): ExerciseInstance {
+  const { verb, tense, topicId, seed } = params
+  const rand = mulberry32(hashSeed(seed))
+  const paradigm = paradigmEs(verb, tense)
+  // avoid ambiguous pairs: skip persons whose form duplicates another's
+  const persons = (params.persons ?? shuffled(PERSONS, rand).slice(0, 5)).filter(
+    (p, _, all) => !all.some((q) => q !== p && paradigm[q] === paradigm[p]),
+  )
+  const pairs: [string, string][] = persons.map((p) => [PRONOUNS[p][0], paradigm[p]])
+  return {
+    type: 'match',
+    lang: 'es',
+    sentence: [],
+    gloss: `Match each pronoun with the right form of “${verb.lemma}”`,
+    answer: '',
+    accepted: [],
+    pairs,
+    skillIds: persons.map((p) => `${topicId}:${p}`),
+  }
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}

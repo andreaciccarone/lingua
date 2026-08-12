@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'wouter'
 import { Flame, Lock } from 'lucide-react'
 
 const UNITS: Record<'es' | 'de', string[]> = {
@@ -48,9 +49,18 @@ export default function Home() {
               </p>
             </div>
             {i === 0 ? (
-              <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
-                Coming soon
-              </span>
+              lang === 'es' ? (
+                <Link
+                  href="/lesson/demo"
+                  className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow"
+                >
+                  Try a lesson
+                </Link>
+              ) : (
+                <span className="rounded-full bg-slate-300 px-3 py-1 text-xs font-semibold text-white">
+                  Coming soon
+                </span>
+              )
             ) : (
               <Lock size={18} className="text-slate-300" />
             )}
