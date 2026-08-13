@@ -13,16 +13,19 @@ backend — all progress in on-device IndexedDB.
 
 ## What's inside
 
-- **Curriculum:** two complete A1→A2 courses — Spanish (6 units, 30 topics, noun gender to the
-  preterite) and German (6 units, 30 topics, der/die/das to the Perfekt and subordinate clauses).
-  Every topic has an explanation, paradigm tables, worked examples and generated drills.
-  21 thematic vocab packs (lexicons: es 58 verbs/101 nouns/34 adjectives; de 33 verbs/95 nouns).
-- **Engines:** Spanish conjugator — present and preterite, with stem changes (quiero, pido),
-  yo-irregulars (hago, salgo), spelling rules (busqué, llegué, leyó), 3rd-person preterite shifts
-  (pidió, durmió), strong preterites (fui, hice, dije) and reflexives (me levanto) — plus
-  article/plural/adjective agreement; German conjugator (vowel change, e-insertion, s-merge,
-  separable prefixes, modals, Präteritum war/hatte, Perfekt with wrongAux drills) + full case
-  decliner (der/ein/kein/possessive × nom/acc/dat, n-declension, dative-plural -n).
+- **Curriculum:** two complete A1→A2 courses — Spanish (7 units, 34 topics: noun gender through
+  preterite, imperfect, present perfect, imperative and por/para) and German (7 units, 33 topics:
+  der/die/das through the Perfekt, adjective endings, past modals, werden-future and subordinate
+  clauses). Every topic has an explanation, paradigm tables, worked examples and generated drills.
+  37 thematic vocab packs; lexicons: es 353 words (83 verbs/211 nouns/59 adjectives),
+  de 298 words (64 verbs/203 nouns/31 adjectives) — every word with Italian glosses.
+- **Engines:** Spanish conjugator — present, preterite, imperfect (era/iba/veía) and present
+  perfect (haber + participles incl. hecho/visto/escrito), with stem changes, yo-irregulars,
+  spelling rules and reflexives — plus article/plural/adjective agreement; German conjugator
+  (vowel change, e-insertion, s-merge, separable prefixes, modals incl. Präteritum konnte/musste,
+  werden, Perfekt with wrongAux drills) + full case decliner (der/ein/kein/possessive ×
+  nom/acc/dat, n-declension, dative-plural -n) + attributive adjective endings
+  (weak/mixed/strong).
   The same engines render the explanation tables and generate the drills, so they can never disagree.
 - **SRS:** SM-2-lite with automatic grading; the card is a grammar *skill* (e.g. "tú-form of -ar
   verbs", "accusative masculine"), so reviews always get freshly generated exercises.

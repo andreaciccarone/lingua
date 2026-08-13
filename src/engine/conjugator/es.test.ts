@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { conjugateEs, paradigmEs } from './es'
+import { conjugateEs, paradigmEs, participleEs } from './es'
 import { ES_VERB_BY_ID } from '../../content/es/morphology/verbs'
 
 function v(id: string) {
@@ -185,5 +185,39 @@ describe('stem changes', () => {
     expect(conjugateEs(v('querer'), 'pres', '2sg').appliedRules).toContain('stemChange:e>ie')
     expect(conjugateEs(v('hacer'), 'pres', '1sg').appliedRules).toContain('yoIrregular')
     expect(conjugateEs(v('hablar'), 'pres', '3pl').appliedRules).toEqual(['regular'])
+  })
+})
+
+describe('imperfect', () => {
+  it('regular -aba/-ía paradigms', () => {
+    expect(paradigmEs(v('hablar'), 'impf')).toEqual({
+      '1sg': 'hablaba', '2sg': 'hablabas', '3sg': 'hablaba',
+      '1pl': 'hablábamos', '2pl': 'hablabais', '3pl': 'hablaban',
+    })
+    expect(conjugateEs(v('comer'), 'impf', '3sg').form).toBe('comía')
+    expect(conjugateEs(v('vivir'), 'impf', '1pl').form).toBe('vivíamos')
+  })
+
+  it('no stem changes in the imperfect: quería, podía', () => {
+    expect(conjugateEs(v('querer'), 'impf', '1sg').form).toBe('quería')
+    expect(conjugateEs(v('poder'), 'impf', '3sg').form).toBe('podía')
+  })
+
+  it('the only three irregulars: era, iba, veía', () => {
+    expect(conjugateEs(v('ser'), 'impf', '1sg').form).toBe('era')
+    expect(conjugateEs(v('ir'), 'impf', '1pl').form).toBe('íbamos')
+    expect(conjugateEs(v('ver'), 'impf', '2sg').form).toBe('veías')
+  })
+})
+
+describe('participles', () => {
+  it('regular -ado/-ido and stored irregulars', () => {
+    expect(participleEs(v('hablar'))).toBe('hablado')
+    expect(participleEs(v('comer'))).toBe('comido')
+    expect(participleEs(v('vivir'))).toBe('vivido')
+    expect(participleEs(v('hacer'))).toBe('hecho')
+    expect(participleEs(v('ver'))).toBe('visto')
+    expect(participleEs(v('escribir'))).toBe('escrito')
+    expect(participleEs(v('volver'))).toBe('vuelto')
   })
 })

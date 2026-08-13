@@ -157,6 +157,35 @@ function agree(participle: string, person: PersonKey): string {
   return PLURAL_PERSONS.has(person) ? participle.slice(0, -1) + 'i' : participle
 }
 
+/** irregular imperfetto stems (essere is fully special-cased below) */
+const IT_IMPF_IRREGULAR: Record<string, string> = {
+  fare: 'facev',
+  dire: 'dicev',
+  bere: 'bevev',
+}
+
+/** imperfetto — the tense Italians use for the Spanish imperfecto: "parlavo" */
+export function imperfIt(infinitive: string, person: PersonKey): string {
+  const [head, ...tail] = infinitive.split(' ')
+  const suffix = tail.length ? ' ' + tail.join(' ') : ''
+  const idx = PERSONS.indexOf(person)
+
+  if (head.endsWith('rsi')) {
+    const base = head.slice(0, -3) + 're'
+    return `${IT_REFLEXIVE[person]} ${imperfIt(base, person)}${suffix}`
+  }
+  if (head === 'essere') {
+    return ['ero', 'eri', 'era', 'eravamo', 'eravate', 'erano'][idx] + suffix
+  }
+  const endings = ['o', 'i', 'a', 'amo', 'ate', 'ano']
+  const irregularStem = IT_IMPF_IRREGULAR[head]
+  if (irregularStem) return irregularStem + endings[idx] + suffix
+  const cls = head.slice(-3)
+  const stem = head.slice(0, -3)
+  const vowel = cls === 'are' ? 'av' : cls === 'ere' ? 'ev' : 'iv'
+  return stem + vowel + endings[idx] + suffix
+}
+
 /** passato prossimo — how an Italian actually renders the Spanish preterite:
  *  "ho parlato", "sono andato", "mi sono alzato" */
 export function pastIt(infinitive: string, person: PersonKey): string {
@@ -238,10 +267,16 @@ export function glossVerb(
 ): string {
   const past = tense === 'pret' || tense === 'perf' || tense === 'praet'
   if (primary === 'it' && verb.glossIt) {
-    const form = past ? pastIt(verb.glossIt, person) : conjugateIt(verb.glossIt, person)
+    const form =
+      tense === 'impf'
+        ? imperfIt(verb.glossIt, person)
+        : past
+          ? pastIt(verb.glossIt, person)
+          : conjugateIt(verb.glossIt, person)
     return `${IT_PRONOUNS[person]} ${form}`
   }
   const base = verb.gloss.replace(/^to /, '').replace(/\s*\(.*\)$/, '')
+  if (tense === 'impf') return `${EN_PRONOUNS[person]} used to ${base}`
   if (past) return `${EN_PRONOUNS[person]} ${pastEn(base)}`
   const form = base === 'be' ? EN_BE[person] : person === '3sg' ? verb.gloss3sg : base
   return `${EN_PRONOUNS[person]} ${form}`
@@ -303,6 +338,21 @@ export function glossAdjNoun(
     return `${glossNoun(noun, { def: true, number }, 'it')} ${form}`
   }
   return `the ${adj.gloss} ${number === 'sg' ? noun.gloss : (noun.glossPlural ?? `${noun.gloss}s`)}`
+}
+
+// elided l’ is handled separately (defaults to masculine — good enough for glosses)
+const IT_GENDER_OF_ARTICLE: Record<string, 'm' | 'f'> = {
+  il: 'm', lo: 'm', la: 'f', le: 'f', i: 'm', gli: 'm',
+}
+
+/** "the good man" / "l’uomo buono" — Italian agreement follows the ITALIAN noun */
+export function glossAdjNounDe(adj: AdjEntry, noun: NounEntry, primary: PrimaryLang): string {
+  if (primary === 'it' && adj.glossItForms && noun.glossIt) {
+    const art = noun.glossIt.split(' ')[0]
+    const g = art.startsWith('l’') ? 'm' : (IT_GENDER_OF_ARTICLE[art] ?? 'm')
+    return `${noun.glossIt} ${adj.glossItForms[g]}`
+  }
+  return `the ${adj.gloss.split(' / ')[0]} ${noun.gloss.split(' (')[0]}`
 }
 
 /** vocab gloss for flashcards/recognition/production prompts */

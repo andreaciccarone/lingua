@@ -1,4 +1,5 @@
 import type {
+  AdjEntry,
   DistractorStrategy,
   ExerciseInstance,
   GermanCase,
@@ -9,10 +10,10 @@ import type {
   VerbEntry,
 } from '../content/types'
 import { loc, PERSONS } from '../content/types'
-import { glossNounBare, glossVerb } from '../i18n/gloss-it'
+import { glossAdjNounDe, glossNounBare, glossVerb } from '../i18n/gloss-it'
 import { tFor } from '../i18n/ui'
 import { conjugateDe } from './conjugator/de'
-import { declineDe, type DeNumber } from './declension/de'
+import { adjEndingDe, declineDe, type DeNumber } from './declension/de'
 import { hashSeed, mulberry32, pick, pickDistractors, shuffled } from './exercises'
 
 const DE_PRONOUNS: Record<PersonKey, string[]> = {
@@ -217,6 +218,67 @@ export function genPerfectDrill(
     ttsText: `${pronoun} ${aux} ${de.participle}`,
     // ge- prefix and -t/-en ending are the morphology under test
     strictSuffixLen: Math.min(2, de.participle.length - 1),
+  }
+}
+
+/** attributive adjective endings: "Das ist ein ___ Mann" → guter.
+ *  Distractors are the same adjective with the other endings. */
+export function genAdjEndingDrill(
+  adj: AdjEntry,
+  noun: NounEntry,
+  opts: {
+    case: GermanCase
+    det: 'def' | 'indef'
+    topicId: string
+    cellId: string
+    seed: string
+    primary: PrimaryLang
+  },
+): ExerciseInstance {
+  const { topicId, cellId, seed, primary } = opts
+  const de = noun.de
+  if (!de) throw new Error(`${noun.id} has no German morphology`)
+  const rand = mulberry32(hashSeed(seed))
+  const { article, noun: nounForm } = declineDe(noun, {
+    case: opts.case,
+    det: opts.det,
+    number: 'sg',
+  })
+  const ending = adjEndingDe({ case: opts.case, gender: de.gender, number: 'sg', det: opts.det })
+  const answer = adj.lemma + ending
+
+  // Weak endings collapse to -e/-en, so same-declension swaps alone can't fill a
+  // bank. Learners also mix the declension CLASSES (*der guter Mann), so draw
+  // candidates across weak, mixed and strong endings alike.
+  const candidates: Candidate[] = []
+  for (const det of ['def', 'indef', 'none'] as const) {
+    for (const g of ['m', 'f', 'n'] as const) {
+      for (const c of ['nom', 'acc', 'dat'] as GermanCase[]) {
+        if (det === opts.det && g === de.gender && c === opts.case) continue
+        candidates.push({
+          text: adj.lemma + adjEndingDe({ case: c, gender: g, number: 'sg', det }),
+          strategy: g === de.gender ? 'wrongCaseArticle' : 'wrongGenderArticle',
+        })
+      }
+    }
+  }
+
+  const frame =
+    opts.case === 'nom'
+      ? ['Das', 'ist', article, '___', nounForm]
+      : ['Ich', 'sehe', article, '___', nounForm]
+  const gapIndex = frame.indexOf('___')
+  return {
+    type: 'mc',
+    lang: 'de',
+    sentence: frame,
+    gapIndex,
+    gloss: glossAdjNounDe(adj, noun, primary),
+    answer,
+    accepted: [],
+    options: shuffled([{ text: answer }, ...pickDistractors(candidates, answer, 3, rand)], rand),
+    skillIds: [`${topicId}:${cellId}`],
+    ttsText: frame.map((t, i) => (i === gapIndex ? answer : t)).join(' '),
   }
 }
 

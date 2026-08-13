@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { genCaseArticleDrill, genConjugationDrillDe, genPerfectDrill, genPluralDrillDe } from './exercises-de'
+import { genAdjEndingDrill, genCaseArticleDrill, genConjugationDrillDe, genPerfectDrill, genPluralDrillDe } from './exercises-de'
 import { genWordOrder } from './exercises'
 import { DE_VERB_BY_ID } from '../content/de/morphology/verbs'
 import { DE_NOUN_BY_ID } from '../content/de/morphology/nouns'
@@ -128,5 +128,42 @@ describe('word-order generator', () => {
     expect([...ex.tiles!].sort()).toEqual(['Heute', 'Kaffee', 'ich', 'trinke'])
     expect(ex.accepted).toEqual(['Ich trinke heute Kaffee'])
     expect(ex.skillIds[0]).toBe('de-word-order-v2:v2.fronted')
+  })
+})
+
+describe('adjective endings', () => {
+  const gut = { id: 'de/adj/gut', lang: 'de' as const, lemma: 'gut', gloss: 'good', glossItForms: { m: 'buono', f: 'buona', mpl: 'buoni', fpl: 'buone' }, tags: [], de: {} }
+
+  it('mixed declension: ein guter Mann, ein gutes Kind', () => {
+    const m = genAdjEndingDrill(gut, mann, {
+      case: 'nom', det: 'indef', topicId: 't', cellId: 'nom', seed: 's', primary: 'en',
+    })
+    expect(m.answer).toBe('guter')
+    expect(m.sentence).toEqual(['Das', 'ist', 'ein', '___', 'Mann'])
+    const kind = DE_NOUN_BY_ID.get('de/noun/kind')!
+    const n = genAdjEndingDrill(gut, kind, {
+      case: 'nom', det: 'indef', topicId: 't', cellId: 'nom', seed: 's', primary: 'en',
+    })
+    expect(n.answer).toBe('gutes')
+  })
+
+  it('weak declension: der gute Mann, den guten Mann', () => {
+    const nom = genAdjEndingDrill(gut, mann, {
+      case: 'nom', det: 'def', topicId: 't', cellId: 'nom', seed: 's', primary: 'en',
+    })
+    expect(nom.answer).toBe('gute')
+    const acc = genAdjEndingDrill(gut, mann, {
+      case: 'acc', det: 'def', topicId: 't', cellId: 'acc', seed: 's', primary: 'en',
+    })
+    expect(acc.answer).toBe('guten')
+    expect(acc.sentence).toEqual(['Ich', 'sehe', 'den', '___', 'Mann'])
+  })
+
+  it('Italian gloss agrees with the Italian noun', () => {
+    const frau = DE_NOUN_BY_ID.get('de/noun/frau')!
+    const ex = genAdjEndingDrill(gut, frau, {
+      case: 'nom', det: 'def', topicId: 't', cellId: 'nom', seed: 's', primary: 'it',
+    })
+    expect(ex.gloss).toBe('la donna buona')
   })
 })

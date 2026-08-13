@@ -1,8 +1,17 @@
-import type { AdjEntry, ExerciseInstance, NounEntry, PrimaryLang } from '../content/types'
+import type {
+  AdjEntry,
+  ExerciseInstance,
+  NounEntry,
+  PersonKey,
+  PrimaryLang,
+  VerbEntry,
+} from '../content/types'
+import { PERSONS } from '../content/types'
+import { ES_HABER, participleEs } from './conjugator/es'
 import { adjAgreeEs, articleEs, pluralEs, type EsNumber } from './morph/es'
-import { glossAdjNoun, glossNoun } from '../i18n/gloss-it'
+import { glossAdjNoun, glossNoun, glossVerb } from '../i18n/gloss-it'
 import { tFor } from '../i18n/ui'
-import { hashSeed, mulberry32, pickDistractors, shuffled } from './exercises'
+import { hashSeed, mulberry32, pick, pickDistractors, shuffled } from './exercises'
 
 function nounForm(noun: NounEntry, number: EsNumber): string {
   return number === 'sg' ? noun.lemma : pluralEs(noun)
@@ -125,5 +134,69 @@ export function genAdjAgreeDrill(
     options: shuffled([{ text: answer }, ...pickDistractors(candidates, answer, 3, rand)], rand),
     skillIds: [`${topicId}:${gender}${number === 'pl' ? '.pl' : ''}`],
     ttsText: `${articleEs(noun, true, number)} ${nounForm(noun, number)} ${answer}`,
+  }
+}
+
+
+const ES_SUBJECTS: Record<PersonKey, string[]> = {
+  '1sg': ['Yo'],
+  '2sg': ['Tú'],
+  '3sg': ['Él', 'Ella'],
+  '1pl': ['Nosotros'],
+  '2pl': ['Vosotros'],
+  '3pl': ['Ellos', 'Ellas'],
+}
+
+/** Spanish perfect drill. aux mode: "Yo ___ comido" → he. participle mode:
+ *  "Yo he ___ (comer)" → comido (cloze; irregular participles like hecho drilled). */
+export function genPerfectDrillEs(
+  verb: VerbEntry,
+  opts: {
+    mode: 'aux' | 'participle'
+    person: PersonKey
+    topicId: string
+    cellId: string
+    seed: string
+    primary: PrimaryLang
+  },
+): ExerciseInstance {
+  const { mode, person, topicId, cellId, seed, primary } = opts
+  const rand = mulberry32(hashSeed(seed))
+  const subject = pick(ES_SUBJECTS[person], rand)
+  const aux = ES_HABER[person]
+  const participle = participleEs(verb)
+  const gloss = glossVerb(verb, person, primary, 'perf')
+
+  if (mode === 'aux') {
+    const candidates = PERSONS.filter((p) => p !== person).map((p) => ({
+      text: ES_HABER[p],
+      strategy: 'wrongPerson' as const,
+    }))
+    return {
+      type: 'mc',
+      lang: 'es',
+      sentence: [subject, '___', participle],
+      gapIndex: 1,
+      gloss,
+      answer: aux,
+      accepted: [],
+      options: shuffled([{ text: aux }, ...pickDistractors(candidates, aux, 3, rand)], rand),
+      skillIds: [`${topicId}:${cellId}`],
+      ttsText: `${subject.toLowerCase()} ${aux} ${participle}`,
+    }
+  }
+
+  return {
+    type: 'cloze',
+    lang: 'es',
+    sentence: [subject, aux, '___', `(${verb.lemma})`],
+    gapIndex: 2,
+    gloss,
+    answer: participle,
+    accepted: [],
+    skillIds: [`${topicId}:${cellId}`],
+    ttsText: `${subject.toLowerCase()} ${aux} ${participle}`,
+    // -ado/-ido (and hecho/dicho endings) are the morphology under test
+    strictSuffixLen: 3,
   }
 }

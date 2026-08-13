@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { conjugateIt, glossNoun, glossVerb, pastIt } from './gloss-it'
+import { conjugateIt, glossNoun, glossVerb, imperfIt, pastIt } from './gloss-it'
 import type { NounEntry, VerbEntry } from '../content/types'
 
 describe('Italian mini-conjugator', () => {
@@ -85,5 +85,23 @@ describe('gloss helpers', () => {
   it('falls back to English when glossIt is missing', () => {
     const bare: VerbEntry = { ...hablar, glossIt: undefined }
     expect(glossVerb(bare, '3sg', 'it')).toBe('he/she speaks')
+  })
+})
+
+describe('imperfetto', () => {
+  it('regular and irregular stems', () => {
+    expect(imperfIt('parlare', '1sg')).toBe('parlavo')
+    expect(imperfIt('parlare', '1pl')).toBe('parlavamo')
+    expect(imperfIt('leggere', '3sg')).toBe('leggeva')
+    expect(imperfIt('dormire', '3pl')).toBe('dormivano')
+    expect(imperfIt('essere', '3sg')).toBe('era')
+    expect(imperfIt('fare', '1pl')).toBe('facevamo')
+    expect(imperfIt('bere', '2sg')).toBe('bevevi')
+    expect(imperfIt('alzarsi', '1sg')).toBe('mi alzavo')
+  })
+
+  it('glossVerb impf renders imperfetto / used to', () => {
+    expect(glossVerb(hablar, '3sg', 'it', 'impf')).toBe('lui/lei parlava')
+    expect(glossVerb(hablar, '1sg', 'en', 'impf')).toBe('I used to speak')
   })
 })

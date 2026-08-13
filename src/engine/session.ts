@@ -31,8 +31,14 @@ import {
   mulberry32,
   shuffled,
 } from './exercises'
-import { genAdjAgreeDrill, genArticleDrill, genPluralDrill } from './exercises-es'
 import {
+  genAdjAgreeDrill,
+  genArticleDrill,
+  genPerfectDrillEs,
+  genPluralDrill,
+} from './exercises-es'
+import {
+  genAdjEndingDrill,
   genCaseArticleDrill,
   genConjugationDrillDe,
   genMatchDrillDe,
@@ -268,27 +274,41 @@ function expandDrill(
     }
     case 'word-order':
       return spec.items.map((item, j) => genWordOrder(item, topic.lang, topic.id, seed(j), primary))
+    case 'adj-ending': {
+      const rand = mulberry32(hashSeed(seed('ae')))
+      return shuffled(spec.pairs, rand)
+        .slice(0, spec.count)
+        .map(([adjId, nounId], j) => {
+          const adj = adjById(adjId)
+          const noun = nounById(nounId)
+          if (!adj || !noun) return null
+          return genAdjEndingDrill(adj, noun, {
+            case: spec.case,
+            det: spec.det,
+            topicId: topic.id,
+            cellId: spec.cellId,
+            seed: seed(j),
+            primary,
+          })
+        })
+        .filter((e): e is ExerciseInstance => !!e)
+    }
     case 'perfect': {
-      const auxVerbs = perfectAuxVerbs()
-      if (!auxVerbs) return []
       const rand = mulberry32(hashSeed(seed('pf')))
       const verbs = shuffled(
         spec.verbIds.map(verbById).filter((v) => !!v),
         rand,
       ).slice(0, spec.count)
+      const auxVerbs = de ? perfectAuxVerbs() : null
+      if (de && !auxVerbs) return []
       return verbs.map((verb, j) => {
         const mode =
           spec.mode === 'mix' ? (j % 2 === 0 ? 'aux' : 'participle') : spec.mode
         const person = spec.persons[j % spec.persons.length]
-        return genPerfectDrill(verb, {
-          mode,
-          person,
-          topicId: topic.id,
-          cellId: spec.cellId,
-          auxVerbs,
-          seed: seed(j),
-          primary,
-        })
+        const common = { mode, person, topicId: topic.id, cellId: spec.cellId, seed: seed(j), primary }
+        return de
+          ? genPerfectDrill(verb, { ...common, auxVerbs: auxVerbs! })
+          : genPerfectDrillEs(verb, common)
       })
     }
     case 'authored':
@@ -428,12 +448,35 @@ export function reviewExerciseForSkill(
   // perfect-tense cells
   for (const spec of topic.drillItems) {
     if (spec.gen !== 'perfect' || spec.cellId !== cellId) continue
-    const auxVerbs = perfectAuxVerbs()
     const verb = verbById(shuffled(spec.verbIds, rand)[0])
-    if (!verb || !auxVerbs) return null
+    if (!verb) return null
     const mode = spec.mode === 'participle' ? 'participle' : rand() < 0.5 ? 'aux' : 'participle'
     const person = spec.persons[Math.floor(rand() * spec.persons.length)]
-    return genPerfectDrill(verb, { mode, person, topicId, cellId, auxVerbs, seed, primary })
+    const common = { mode, person, topicId, cellId, seed, primary } as const
+    if (de) {
+      const auxVerbs = perfectAuxVerbs()
+      if (!auxVerbs) return null
+      return genPerfectDrill(verb, { ...common, auxVerbs })
+    }
+    return genPerfectDrillEs(verb, common)
+  }
+
+  // adjective-ending cells
+  for (const spec of topic.drillItems) {
+    if (spec.gen !== 'adj-ending' || spec.cellId !== cellId) continue
+    const pickPair = shuffled(spec.pairs, rand)[0]
+    if (!pickPair) return null
+    const adj = adjById(pickPair[0])
+    const noun = nounById(pickPair[1])
+    if (!adj || !noun) return null
+    return genAdjEndingDrill(adj, noun, {
+      case: spec.case,
+      det: spec.det,
+      topicId,
+      cellId,
+      seed,
+      primary,
+    })
   }
 
   // word-order cells

@@ -9,6 +9,7 @@ import { DE_TOPIC_BY_ID, DE_UNITS, DE_UPCOMING_UNITS } from './de'
 import { DE_LEXEME_BY_KEY, DE_PACKS } from './de/packs'
 import { DE_VERB_BY_ID } from './de/morphology/verbs'
 import { DE_NOUN_BY_ID } from './de/morphology/nouns'
+import { DE_ADJ_BY_ID } from './de/morphology/adjectives'
 import type { VocabLexeme } from '../engine/vocab'
 
 export function topicById(id: string): Topic | undefined {
@@ -50,5 +51,5 @@ export function nounById(id: string): NounEntry | undefined {
 }
 
 export function adjById(id: string): AdjEntry | undefined {
-  return ES_ADJ_BY_ID.get(id)
+  return ES_ADJ_BY_ID.get(id) ?? DE_ADJ_BY_ID.get(id)
 }

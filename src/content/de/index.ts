@@ -5,6 +5,7 @@ import { DE_U3_TOPICS } from './units/u3'
 import { DE_U4_TOPICS } from './units/u4'
 import { DE_U5_TOPICS } from './units/u5'
 import { DE_U6_TOPICS } from './units/u6'
+import { DE_U7_TOPICS } from './units/u7'
 
 export const DE_UNITS: Unit[] = [
   {
@@ -35,7 +36,7 @@ export const DE_UNITS: Unit[] = [
       'de-vowel-change',
       'de-coord-conjunctions',
     ],
-    packIds: ['de-pack-food', 'de-pack-town', 'de-pack-daily'],
+    packIds: ['de-pack-food', 'de-pack-town', 'de-pack-daily', 'de-pack-food2'],
   },
   {
     id: 'de-u3',
@@ -52,7 +53,7 @@ export const DE_UNITS: Unit[] = [
       'de-possessives',
       'de-acc-pronouns',
     ],
-    packIds: ['de-pack-house'],
+    packIds: ['de-pack-house', 'de-pack-work'],
   },
   {
     id: 'de-u4',
@@ -67,7 +68,7 @@ export const DE_UNITS: Unit[] = [
       'de-prep-dat',
       'de-two-way-preps',
     ],
-    packIds: ['de-pack-clothes'],
+    packIds: ['de-pack-clothes', 'de-pack-feelings', 'de-pack-tech'],
   },
   {
     id: 'de-u5',
@@ -75,7 +76,7 @@ export const DE_UNITS: Unit[] = [
     title: 'Vergangenheit',
     blurb: { en: 'The perfect tense', it: 'Il passato prossimo (Perfekt)' },
     topicIds: ['de-perfect-haben', 'de-perfect-sein', 'de-praeteritum-sein-haben'],
-    packIds: ['de-pack-routine'],
+    packIds: ['de-pack-routine', 'de-pack-body'],
   },
   {
     id: 'de-u6',
@@ -83,7 +84,18 @@ export const DE_UNITS: Unit[] = [
     title: 'Komplexe Sätze',
     blurb: { en: 'Subordinate clauses and comparisons', it: 'Frasi subordinate e comparativi' },
     topicIds: ['de-subclause-weil-dass', 'de-weil-vs-denn', 'de-comparative', 'de-wo-questions-recap'],
-    packIds: ['de-pack-travel'],
+    packIds: ['de-pack-travel', 'de-pack-nature', 'de-pack-city'],
+  },
+  {
+    id: 'de-u7',
+    lang: 'de',
+    title: 'Feinschliff',
+    blurb: {
+      en: 'Adjective endings, past modals and the future',
+      it: 'Desinenze degli aggettivi, modali al passato e futuro',
+    },
+    topicIds: ['de-adj-endings', 'de-modal-praeteritum', 'de-future'],
+    packIds: ['de-pack-time'],
   },
 ]
 
@@ -94,6 +106,7 @@ export const DE_TOPICS: Topic[] = [
   ...DE_U4_TOPICS,
   ...DE_U5_TOPICS,
   ...DE_U6_TOPICS,
+  ...DE_U7_TOPICS,
 ]
 export const DE_TOPIC_BY_ID = new Map(DE_TOPICS.map((t) => [t.id, t]))
 

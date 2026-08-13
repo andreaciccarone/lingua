@@ -18,8 +18,8 @@ export function loc(text: LocText, primary: PrimaryLang): string {
 export type PersonKey = '1sg' | '2sg' | '3sg' | '1pl' | '2pl' | '3pl'
 export const PERSONS: PersonKey[] = ['1sg', '2sg', '3sg', '1pl', '2pl', '3pl']
 
-/** pres/pret Spanish; pres/perf/praet German */
-export type TenseKey = 'pres' | 'pret' | 'perf' | 'praet'
+/** pres/pret/impf/perf Spanish; pres/perf/praet German */
+export type TenseKey = 'pres' | 'pret' | 'impf' | 'perf' | 'praet'
 
 export type GermanCase = 'nom' | 'acc' | 'dat'
 export type GermanGender = 'm' | 'f' | 'n'
@@ -65,6 +65,8 @@ export interface VerbEntry {
     stemChange?: StemChange
     yoIrregular?: string // "hago"
     reflexive?: boolean
+    /** irregular past participle only (hecho, dicho); regular -ado/-ido derived */
+    participle?: string
     /** full override cells; engine fills everything else */
     irregular?: Partial<Record<TenseKey, Partial<Record<PersonKey, string>>>>
   }
@@ -228,6 +230,14 @@ export type DrillSpec =
       count: number
       mode: 'aux' | 'participle' | 'mix'
       persons: PersonKey[]
+      cellId: string
+    }
+  | {
+      gen: 'adj-ending'
+      pairs: [adjId: string, nounId: string][]
+      count: number
+      case: GermanCase
+      det: 'def' | 'indef'
       cellId: string
     }
   | { gen: 'authored'; exercises: AuthoredExerciseInstance[] }

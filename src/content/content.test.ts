@@ -32,6 +32,7 @@ function cellsOf(spec: DrillSpec, topic: Topic): string[] {
       })
     case 'case-article':
     case 'perfect':
+    case 'adj-ending':
       return [spec.cellId]
     case 'word-order':
       return spec.items.map((i) => i.cellId)
@@ -54,6 +55,7 @@ function lexemeIdsOf(spec: DrillSpec): string[] {
     case 'perfect':
       return spec.verbIds
     case 'adj-agree':
+    case 'adj-ending':
       return spec.pairs.flat()
     default:
       return []

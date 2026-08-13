@@ -14,7 +14,7 @@ export interface ConjugatedForm {
   appliedRules: RuleTag[]
 }
 
-export const ES_ENDINGS: Record<'pres' | 'pret', Record<'ar' | 'er' | 'ir', string[]>> = {
+export const ES_ENDINGS: Record<'pres' | 'pret' | 'impf', Record<'ar' | 'er' | 'ir', string[]>> = {
   pres: {
     ar: ['o', 'as', 'a', 'amos', 'áis', 'an'],
     er: ['o', 'es', 'e', 'emos', 'éis', 'en'],
@@ -24,6 +24,12 @@ export const ES_ENDINGS: Record<'pres' | 'pret', Record<'ar' | 'er' | 'ir', stri
     ar: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'],
     er: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
     ir: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
+  },
+  // only ser (era), ir (iba), ver (veía) are irregular — stored as overrides
+  impf: {
+    ar: ['aba', 'abas', 'aba', 'ábamos', 'abais', 'aban'],
+    er: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
+    ir: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
   },
 }
 
@@ -51,7 +57,7 @@ function applyStemChange(stem: string, change: StemChange): string {
 export function conjugateEs(verb: VerbEntry, tense: TenseKey, person: PersonKey): ConjugatedForm {
   const es = verb.es
   if (!es) throw new Error(`${verb.id} has no Spanish morphology`)
-  if (tense !== 'pres' && tense !== 'pret') {
+  if (tense !== 'pres' && tense !== 'pret' && tense !== 'impf') {
     throw new Error(`Spanish tense ${tense} not supported`)
   }
 
@@ -105,6 +111,25 @@ export function conjugateEs(verb: VerbEntry, tense: TenseKey, person: PersonKey)
 
   if (rules.length === 0) rules.push('regular')
   return { form: stem + ending, appliedRules: rules }
+}
+
+/** past participle: stored irregular (hecho) or regular -ado/-ido */
+export function participleEs(verb: VerbEntry): string {
+  const es = verb.es
+  if (!es) throw new Error(`${verb.id} has no Spanish morphology`)
+  if (es.participle) return es.participle
+  const stem = verb.lemma.slice(0, -2)
+  return stem + (es.class === 'ar' ? 'ado' : 'ido')
+}
+
+/** haber, present — the perfect auxiliary */
+export const ES_HABER: Record<PersonKey, string> = {
+  '1sg': 'he',
+  '2sg': 'has',
+  '3sg': 'ha',
+  '1pl': 'hemos',
+  '2pl': 'habéis',
+  '3pl': 'han',
 }
 
 /** reflexive pronoun for a person (me levanto, te levantas…) */

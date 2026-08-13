@@ -80,3 +80,42 @@ export function declineDe(noun: NounEntry, opts: DeclineOptions): DeclinedNP {
   }
   return { article, noun: nounForm }
 }
+
+
+// ---------- attributive adjective endings ----------
+
+/** weak endings (after der-words): case × (m, f, n, pl) */
+const ADJ_WEAK: Record<GermanCase, [string, string, string, string]> = {
+  nom: ['e', 'e', 'e', 'en'],
+  acc: ['en', 'e', 'e', 'en'],
+  dat: ['en', 'en', 'en', 'en'],
+}
+
+/** mixed endings (after ein-words: ein/kein/mein…) */
+const ADJ_MIXED: Record<GermanCase, [string, string, string, string]> = {
+  nom: ['er', 'e', 'es', 'en'],
+  acc: ['en', 'e', 'es', 'en'],
+  dat: ['en', 'en', 'en', 'en'],
+}
+
+/** strong endings (no determiner) — the adjective carries the case itself */
+const ADJ_STRONG: Record<GermanCase, [string, string, string, string]> = {
+  nom: ['er', 'e', 'es', 'e'],
+  acc: ['en', 'e', 'es', 'e'],
+  dat: ['em', 'er', 'em', 'en'],
+}
+
+export interface AdjEndingOptions {
+  case: GermanCase
+  gender: GermanGender
+  number: DeNumber
+  det: 'def' | 'indef' | 'kein' | 'poss' | 'none'
+}
+
+/** ending only ('er' in "ein guter Mann"); caller appends to the adjective stem */
+export function adjEndingDe(opts: AdjEndingOptions): string {
+  const s = slot(opts.gender, opts.number)
+  if (opts.det === 'def') return ADJ_WEAK[opts.case][s]
+  if (opts.det === 'none') return ADJ_STRONG[opts.case][s]
+  return ADJ_MIXED[opts.case][s]
+}

@@ -5,6 +5,7 @@ import { ES_U3_TOPICS } from './units/u3'
 import { ES_U4_TOPICS } from './units/u4'
 import { ES_U5_TOPICS } from './units/u5'
 import { ES_U6_TOPICS } from './units/u6'
+import { ES_U7_TOPICS } from './units/u7'
 
 export const ES_UNITS: Unit[] = [
   {
@@ -34,7 +35,7 @@ export const ES_UNITS: Unit[] = [
       'es-estar-present',
       'es-ser-vs-estar',
     ],
-    packIds: ['es-pack-food', 'es-pack-town', 'es-pack-daily'],
+    packIds: ['es-pack-food', 'es-pack-town', 'es-pack-daily', 'es-pack-food2'],
   },
   {
     id: 'es-u3',
@@ -49,7 +50,7 @@ export const ES_UNITS: Unit[] = [
       'es-stem-o-ue-e-i',
       'es-saber-conocer',
     ],
-    packIds: ['es-pack-house', 'es-pack-actions'],
+    packIds: ['es-pack-house', 'es-pack-actions', 'es-pack-work'],
   },
   {
     id: 'es-u4',
@@ -67,7 +68,7 @@ export const ES_UNITS: Unit[] = [
       'es-iop',
       'es-gustar',
     ],
-    packIds: ['es-pack-clothes', 'es-pack-describe2'],
+    packIds: ['es-pack-clothes', 'es-pack-describe2', 'es-pack-feelings', 'es-pack-tech'],
   },
   {
     id: 'es-u5',
@@ -75,7 +76,7 @@ export const ES_UNITS: Unit[] = [
     title: 'Mi día',
     blurb: { en: 'Reflexives, routines and comparisons', it: 'Riflessivi, routine e comparativi' },
     topicIds: ['es-reflexives', 'es-progressive', 'es-obligation', 'es-comparatives'],
-    packIds: ['es-pack-routine'],
+    packIds: ['es-pack-routine', 'es-pack-body'],
   },
   {
     id: 'es-u6',
@@ -83,7 +84,18 @@ export const ES_UNITS: Unit[] = [
     title: 'Ayer',
     blurb: { en: 'The past tense', it: 'Il passato' },
     topicIds: ['es-preterite-regular', 'es-preterite-irregular', 'es-past-time'],
-    packIds: ['es-pack-travel'],
+    packIds: ['es-pack-travel', 'es-pack-nature', 'es-pack-city'],
+  },
+  {
+    id: 'es-u7',
+    lang: 'es',
+    title: 'Un paso más',
+    blurb: {
+      en: 'The imperfect, present perfect, commands and por/para',
+      it: 'Imperfetto, passato prossimo, imperativo e por/para',
+    },
+    topicIds: ['es-imperfect', 'es-perfect', 'es-imperative', 'es-por-para'],
+    packIds: ['es-pack-time'],
   },
 ]
 
@@ -94,6 +106,7 @@ export const ES_TOPICS: Topic[] = [
   ...ES_U4_TOPICS,
   ...ES_U5_TOPICS,
   ...ES_U6_TOPICS,
+  ...ES_U7_TOPICS,
 ]
 export const ES_TOPIC_BY_ID = new Map(ES_TOPICS.map((t) => [t.id, t]))
 
