@@ -11,10 +11,12 @@ export interface ConjugatedFormDe {
 /** regular present endings by person: ich/du/er/wir/ihr/sie */
 const PRES_ENDINGS = ['e', 'st', 't', 'en', 't', 'en']
 
-/** stems ending in t/d (and consonant+m/n clusters) insert an e before -st/-t */
+/** stems ending in t/d (and consonant+m/n clusters like atm-, öffn-) insert an
+ *  e before -st/-t. Double m/n (komm-, könn-) and vowel/l/r/h + m/n (wohn-,
+ *  lern-) do NOT. (Orthographic 'chn' as in rechnen would need a special case.) */
 function needsEInsertion(stem: string): boolean {
   if (/[td]$/.test(stem)) return true
-  return /[^aeiouäöülrh][mn]$/.test(stem)
+  return /[^aeiouäöülrhmn][mn]$/.test(stem)
 }
 
 /** stems ending in an s-sound merge with the du -st ending: heißen -> heißt */
@@ -35,9 +37,16 @@ function stemOf(lemma: string, separablePrefix?: string): string {
 export function conjugateDe(verb: VerbEntry, tense: TenseKey, person: PersonKey): ConjugatedFormDe {
   const de = verb.de
   if (!de) throw new Error(`${verb.id} has no German morphology`)
-  if (tense !== 'pres') throw new Error(`German tense ${tense} not supported yet (perfect uses participle)`)
 
   const prefix = de.separablePrefix
+
+  // Präteritum exists only as stored forms (war, hatte) at this level
+  if (tense === 'praet') {
+    const stored = de.irregular?.praet?.[person]
+    if (!stored) throw new Error(`${verb.id} has no Präteritum forms`)
+    return { form: stored, prefix, appliedRules: ['irregularCell'] }
+  }
+  if (tense !== 'pres') throw new Error(`German tense ${tense} not supported yet (perfect uses participle)`)
 
   const override = de.irregular?.pres?.[person]
   if (override) return { form: override, prefix, appliedRules: ['irregularCell'] }

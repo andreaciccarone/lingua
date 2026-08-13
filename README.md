@@ -13,15 +13,16 @@ backend — all progress in on-device IndexedDB.
 
 ## What's inside
 
-- **Curriculum:** the complete Spanish A1→A2 course — 6 units, 30 topics, from noun gender to the
-  preterite — plus German units 1–2 (12 topics). Every topic has an explanation, paradigm tables,
-  worked examples and generated drills. 17 thematic vocab packs (Spanish lexicon: 58 verbs,
-  101 nouns, 34 adjectives).
+- **Curriculum:** two complete A1→A2 courses — Spanish (6 units, 30 topics, noun gender to the
+  preterite) and German (6 units, 30 topics, der/die/das to the Perfekt and subordinate clauses).
+  Every topic has an explanation, paradigm tables, worked examples and generated drills.
+  21 thematic vocab packs (lexicons: es 58 verbs/101 nouns/34 adjectives; de 33 verbs/95 nouns).
 - **Engines:** Spanish conjugator — present and preterite, with stem changes (quiero, pido),
   yo-irregulars (hago, salgo), spelling rules (busqué, llegué, leyó), 3rd-person preterite shifts
   (pidió, durmió), strong preterites (fui, hice, dije) and reflexives (me levanto) — plus
-  article/plural/adjective agreement; German conjugator (vowel change, e-insertion, s-merge, separable prefixes, perfect) +
-  full case decliner (der/ein/kein/possessive × nom/acc/dat, n-declension, dative-plural -n).
+  article/plural/adjective agreement; German conjugator (vowel change, e-insertion, s-merge,
+  separable prefixes, modals, Präteritum war/hatte, Perfekt with wrongAux drills) + full case
+  decliner (der/ein/kein/possessive × nom/acc/dat, n-declension, dative-plural -n).
   The same engines render the explanation tables and generate the drills, so they can never disagree.
 - **SRS:** SM-2-lite with automatic grading; the card is a grammar *skill* (e.g. "tú-form of -ar
   verbs", "accusative masculine"), so reviews always get freshly generated exercises.
@@ -76,5 +77,5 @@ content without satisfying these fails `npm test`, and therefore the deploy.
 
 ## Roadmap
 
-- German units 3–6 (modal verbs, dative, Perfekt, subordinate clauses)
-- Dark mode, error-spotting exercise type, review-forecast chart, test-out quizzes for topics.
+- Dark mode, error-spotting exercise type, review-forecast chart, test-out quizzes for topics
+- B1 track (subjunctive, Konjunktiv II, relative clauses…) whenever A2 feels solid.

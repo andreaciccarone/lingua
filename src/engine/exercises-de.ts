@@ -29,14 +29,18 @@ interface Candidate {
   strategy: DistractorStrategy
 }
 
-function deConjugationCandidates(verb: VerbEntry, person: PersonKey): Candidate[] {
+function deConjugationCandidates(
+  verb: VerbEntry,
+  person: PersonKey,
+  tense: 'pres' | 'praet',
+): Candidate[] {
   const out: Candidate[] = []
   for (const p of PERSONS) {
     if (p === person) continue
-    out.push({ text: conjugateDe(verb, 'pres', p).form, strategy: 'wrongPerson' })
+    out.push({ text: conjugateDe(verb, tense, p).form, strategy: 'wrongPerson' })
   }
   // missing vowel change: *du fahrst
-  if (verb.de?.vowelChange && (person === '2sg' || person === '3sg')) {
+  if (tense === 'pres' && verb.de?.vowelChange && (person === '2sg' || person === '3sg')) {
     const lemma = verb.lemma
     const stem = lemma.endsWith('en') ? lemma.slice(0, -2) : lemma.slice(0, -1)
     out.push({
@@ -55,18 +59,19 @@ export function genConjugationDrillDe(params: {
   type: 'mc' | 'cloze'
   seed: string
   primary: PrimaryLang
+  tense?: 'pres' | 'praet'
 }): ExerciseInstance {
-  const { verb, person, topicId, type, seed, primary } = params
+  const { verb, person, topicId, type, seed, primary, tense = 'pres' } = params
   const rand = mulberry32(hashSeed(seed))
   const pronoun = pick(DE_PRONOUNS[person], rand)
-  const { form } = conjugateDe(verb, 'pres', person)
+  const { form } = conjugateDe(verb, tense, person)
 
   const base: ExerciseInstance = {
     type,
     lang: 'de',
     sentence: [capitalize(pronoun), '___', `(${verb.lemma})`],
     gapIndex: 1,
-    gloss: glossVerb(verb, person, primary),
+    gloss: glossVerb(verb, person, primary, tense),
     answer: form,
     accepted: [],
     skillIds: [`${topicId}:${person}`],
@@ -76,7 +81,10 @@ export function genConjugationDrillDe(params: {
   }
   if (type === 'mc') {
     base.options = shuffled(
-      [{ text: form }, ...pickDistractors(deConjugationCandidates(verb, person), form, 3, rand)],
+      [
+        { text: form },
+        ...pickDistractors(deConjugationCandidates(verb, person, tense), form, 3, rand),
+      ],
       rand,
     )
   }
@@ -151,17 +159,79 @@ export function genCaseArticleDrill(
   }
 }
 
+/** Perfekt drill. aux mode: "Ich ___ gegessen" → habe (wrongAux/wrongPerson
+ *  distractors). participle mode: "Ich habe ___ (essen)" → gegessen (cloze). */
+export function genPerfectDrill(
+  verb: VerbEntry,
+  opts: {
+    mode: 'aux' | 'participle'
+    person: PersonKey
+    topicId: string
+    cellId: string
+    auxVerbs: { haben: VerbEntry; sein: VerbEntry }
+    seed: string
+    primary: PrimaryLang
+  },
+): ExerciseInstance {
+  const { mode, person, topicId, cellId, auxVerbs, seed, primary } = opts
+  const de = verb.de
+  if (!de) throw new Error(`${verb.id} has no German morphology`)
+  const rand = mulberry32(hashSeed(seed))
+  const pronoun = pick(DE_PRONOUNS[person], rand)
+  const auxVerb = de.aux === 'sein' ? auxVerbs.sein : auxVerbs.haben
+  const otherAuxVerb = de.aux === 'sein' ? auxVerbs.haben : auxVerbs.sein
+  const aux = conjugateDe(auxVerb, 'pres', person).form
+  const gloss = glossVerb(verb, person, primary, 'perf')
+
+  if (mode === 'aux') {
+    const candidates: Candidate[] = [
+      { text: conjugateDe(otherAuxVerb, 'pres', person).form, strategy: 'wrongAux' },
+      ...PERSONS.filter((p) => p !== person).map((p) => ({
+        text: conjugateDe(auxVerb, 'pres', p).form,
+        strategy: 'wrongPerson' as const,
+      })),
+    ]
+    return {
+      type: 'mc',
+      lang: 'de',
+      sentence: [capitalize(pronoun), '___', de.participle],
+      gapIndex: 1,
+      gloss,
+      answer: aux,
+      accepted: [],
+      options: shuffled([{ text: aux }, ...pickDistractors(candidates, aux, 3, rand)], rand),
+      skillIds: [`${topicId}:${cellId}`],
+      ttsText: `${pronoun} ${aux} ${de.participle}`,
+    }
+  }
+
+  return {
+    type: 'cloze',
+    lang: 'de',
+    sentence: [capitalize(pronoun), aux, '___', `(${verb.lemma})`],
+    gapIndex: 2,
+    gloss,
+    answer: de.participle,
+    accepted: [],
+    skillIds: [`${topicId}:${cellId}`],
+    ttsText: `${pronoun} ${aux} ${de.participle}`,
+    // ge- prefix and -t/-en ending are the morphology under test
+    strictSuffixLen: Math.min(2, de.participle.length - 1),
+  }
+}
+
 /** pronoun ↔ conjugated-form match board (German) */
 export function genMatchDrillDe(params: {
   verb: VerbEntry
   topicId: string
   seed: string
   primary: PrimaryLang
+  tense?: 'pres' | 'praet'
 }): ExerciseInstance {
-  const { verb, topicId, seed, primary } = params
+  const { verb, topicId, seed, primary, tense = 'pres' } = params
   const rand = mulberry32(hashSeed(seed))
   const forms = Object.fromEntries(
-    PERSONS.map((p) => [p, conjugateDe(verb, 'pres', p).form]),
+    PERSONS.map((p) => [p, conjugateDe(verb, tense, p).form]),
   ) as Record<PersonKey, string>
   const persons = shuffled(PERSONS, rand)
     .slice(0, 5)

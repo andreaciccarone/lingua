@@ -57,6 +57,13 @@ describe('spelling rules', () => {
     expect(conjugateDe(v('heißen'), 'pres', '2sg').form).toBe('heißt')
     expect(conjugateDe(v('heißen'), 'pres', '3sg').form).toBe('heißt')
   })
+
+  it('no e-insertion after double m/n or vowel+n: kommst, wohnst', () => {
+    expect(conjugateDe(v('kommen'), 'pres', '2sg').form).toBe('kommst')
+    expect(conjugateDe(v('kommen'), 'pres', '3sg').form).toBe('kommt')
+    expect(conjugateDe(v('wohnen'), 'pres', '2sg').form).toBe('wohnst')
+    expect(conjugateDe(v('lernen'), 'pres', '3sg').form).toBe('lernt')
+  })
 })
 
 describe('strong-verb vowel change (du/er only)', () => {
@@ -78,6 +85,39 @@ describe('separable verbs', () => {
     const c = conjugateDe(v('aufstehen'), 'pres', '1sg')
     expect(c.form).toBe('stehe')
     expect(c.prefix).toBe('auf')
+  })
+})
+
+describe('Präteritum (sein/haben only)', () => {
+  it('war and hatte', () => {
+    expect(conjugateDe(v('sein'), 'praet', '1sg').form).toBe('war')
+    expect(conjugateDe(v('sein'), 'praet', '2sg').form).toBe('warst')
+    expect(conjugateDe(v('sein'), 'praet', '1pl').form).toBe('waren')
+    expect(conjugateDe(v('haben'), 'praet', '3sg').form).toBe('hatte')
+    expect(conjugateDe(v('haben'), 'praet', '2pl').form).toBe('hattet')
+  })
+
+  it('throws for verbs without stored forms', () => {
+    expect(() => conjugateDe(v('machen'), 'praet', '1sg')).toThrow()
+  })
+})
+
+describe('modal verbs', () => {
+  it('singular is irregular, plural regular', () => {
+    expect(paradigmDe(v('können'), 'pres')).toEqual({
+      '1sg': 'kann',
+      '2sg': 'kannst',
+      '3sg': 'kann',
+      '1pl': 'können',
+      '2pl': 'könnt',
+      '3pl': 'können',
+    })
+    expect(conjugateDe(v('müssen'), 'pres', '3sg').form).toBe('muss')
+    expect(conjugateDe(v('wollen'), 'pres', '1sg').form).toBe('will')
+    expect(conjugateDe(v('dürfen'), 'pres', '2sg').form).toBe('darfst')
+    expect(conjugateDe(v('sollen'), 'pres', '2sg').form).toBe('sollst')
+    expect(conjugateDe(v('sollen'), 'pres', '3sg').form).toBe('soll')
+    expect(conjugateDe(v('möchten'), 'pres', '3sg').form).toBe('möchte')
   })
 })
 

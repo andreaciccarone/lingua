@@ -68,6 +68,43 @@ export const DE_NOUNS: NounEntry[] = [
   { id: 'de/noun/jahr', lang: 'de', lemma: 'Jahr', gloss: 'year', glossIt: 'l’anno', glossItPl: 'gli anni', tags: ['time'], de: { gender: 'n', plural: 'Jahre' } },
   { id: 'de/noun/zeit', lang: 'de', lemma: 'Zeit', gloss: 'time', glossIt: 'il tempo', glossItPl: 'i tempi', tags: ['time'], de: { gender: 'f', plural: 'Zeiten' } },
   { id: 'de/noun/sprache', lang: 'de', lemma: 'Sprache', gloss: 'language', glossIt: 'la lingua', glossItPl: 'le lingue', tags: ['abstract'], de: { gender: 'f', plural: 'Sprachen' } },
+  // house & rooms
+  { id: 'de/noun/küche', lang: 'de', lemma: 'Küche', gloss: 'kitchen', glossIt: 'la cucina', glossItPl: 'le cucine', tags: ['place'], de: { gender: 'f', plural: 'Küchen' } },
+  { id: 'de/noun/bad', lang: 'de', lemma: 'Bad', gloss: 'bathroom', glossIt: 'il bagno', glossItPl: 'i bagni', tags: ['place'], de: { gender: 'n', plural: 'Bäder' } },
+  { id: 'de/noun/schlafzimmer', lang: 'de', lemma: 'Schlafzimmer', gloss: 'bedroom', glossIt: 'la camera da letto', glossItPl: 'le camere da letto', tags: ['place'], de: { gender: 'n', plural: 'Schlafzimmer' } },
+  { id: 'de/noun/wohnzimmer', lang: 'de', lemma: 'Wohnzimmer', gloss: 'living room', glossIt: 'il soggiorno', glossItPl: 'i soggiorni', tags: ['place'], de: { gender: 'n', plural: 'Wohnzimmer' } },
+  { id: 'de/noun/bett', lang: 'de', lemma: 'Bett', gloss: 'bed', glossIt: 'il letto', glossItPl: 'i letti', tags: ['object'], de: { gender: 'n', plural: 'Betten' } },
+  { id: 'de/noun/garten', lang: 'de', lemma: 'Garten', gloss: 'garden', glossIt: 'il giardino', glossItPl: 'i giardini', tags: ['place', 'nature'], de: { gender: 'm', plural: 'Gärten' } },
+  { id: 'de/noun/spiegel', lang: 'de', lemma: 'Spiegel', gloss: 'mirror', glossIt: 'lo specchio', glossItPl: 'gli specchi', tags: ['object'], de: { gender: 'm', plural: 'Spiegel' } },
+  { id: 'de/noun/lampe', lang: 'de', lemma: 'Lampe', gloss: 'lamp', glossIt: 'la lampada', glossItPl: 'le lampade', tags: ['object'], de: { gender: 'f', plural: 'Lampen' } },
+  // clothes & shopping
+  { id: 'de/noun/hemd', lang: 'de', lemma: 'Hemd', gloss: 'shirt', glossIt: 'la camicia', glossItPl: 'le camicie', tags: ['clothing'], de: { gender: 'n', plural: 'Hemden' } },
+  { id: 'de/noun/hose', lang: 'de', lemma: 'Hose', gloss: 'trousers', glossIt: 'i pantaloni', glossItPl: 'i pantaloni', tags: ['clothing'], de: { gender: 'f', plural: 'Hosen' } },
+  { id: 'de/noun/kleid', lang: 'de', lemma: 'Kleid', gloss: 'dress', glossIt: 'il vestito', glossItPl: 'i vestiti', tags: ['clothing'], de: { gender: 'n', plural: 'Kleider' } },
+  { id: 'de/noun/rock', lang: 'de', lemma: 'Rock', gloss: 'skirt', glossIt: 'la gonna', glossItPl: 'le gonne', tags: ['clothing'], de: { gender: 'm', plural: 'Röcke' } },
+  { id: 'de/noun/mantel', lang: 'de', lemma: 'Mantel', gloss: 'coat', glossIt: 'il cappotto', glossItPl: 'i cappotti', tags: ['clothing'], de: { gender: 'm', plural: 'Mäntel' } },
+  { id: 'de/noun/jacke', lang: 'de', lemma: 'Jacke', gloss: 'jacket', glossIt: 'la giacca', glossItPl: 'le giacche', tags: ['clothing'], de: { gender: 'f', plural: 'Jacken' } },
+  { id: 'de/noun/geld', lang: 'de', lemma: 'Geld', gloss: 'money', glossIt: 'i soldi', glossItPl: 'i soldi', tags: ['object'], de: { gender: 'n', plural: 'Geld' } },
+  { id: 'de/noun/preis', lang: 'de', lemma: 'Preis', gloss: 'price', glossIt: 'il prezzo', glossItPl: 'i prezzi', tags: ['abstract'], de: { gender: 'm', plural: 'Preise' } },
+  { id: 'de/noun/geschenk', lang: 'de', lemma: 'Geschenk', gloss: 'gift', glossIt: 'il regalo', glossItPl: 'i regali', tags: ['object'], de: { gender: 'n', plural: 'Geschenke' } },
+  // travel
+  { id: 'de/noun/reise', lang: 'de', lemma: 'Reise', gloss: 'trip', glossIt: 'il viaggio', glossItPl: 'i viaggi', tags: ['abstract'], de: { gender: 'f', plural: 'Reisen' } },
+  { id: 'de/noun/zug', lang: 'de', lemma: 'Zug', gloss: 'train', glossIt: 'il treno', glossItPl: 'i treni', tags: ['vehicle'], de: { gender: 'm', plural: 'Züge' } },
+  { id: 'de/noun/flugzeug', lang: 'de', lemma: 'Flugzeug', gloss: 'airplane', glossIt: 'l’aereo', glossItPl: 'gli aerei', tags: ['vehicle'], de: { gender: 'n', plural: 'Flugzeuge' } },
+  { id: 'de/noun/flughafen', lang: 'de', lemma: 'Flughafen', gloss: 'airport', glossIt: 'l’aeroporto', glossItPl: 'gli aeroporti', tags: ['place'], de: { gender: 'm', plural: 'Flughäfen' } },
+  { id: 'de/noun/hotel', lang: 'de', lemma: 'Hotel', gloss: 'hotel', glossIt: 'l’albergo', glossItPl: 'gli alberghi', tags: ['place'], de: { gender: 'n', plural: 'Hotels' } },
+  { id: 'de/noun/koffer', lang: 'de', lemma: 'Koffer', gloss: 'suitcase', glossIt: 'la valigia', glossItPl: 'le valigie', tags: ['object'], de: { gender: 'm', plural: 'Koffer' } },
+  { id: 'de/noun/fahrkarte', lang: 'de', lemma: 'Fahrkarte', gloss: 'ticket', glossIt: 'il biglietto', glossItPl: 'i biglietti', tags: ['object'], de: { gender: 'f', plural: 'Fahrkarten' } },
+  { id: 'de/noun/meer', lang: 'de', lemma: 'Meer', gloss: 'sea', glossIt: 'il mare', glossItPl: 'i mari', tags: ['nature', 'place'], de: { gender: 'n', plural: 'Meere' } },
+  { id: 'de/noun/berg', lang: 'de', lemma: 'Berg', gloss: 'mountain', glossIt: 'la montagna', glossItPl: 'le montagne', tags: ['nature', 'place'], de: { gender: 'm', plural: 'Berge' } },
+  { id: 'de/noun/sonne', lang: 'de', lemma: 'Sonne', gloss: 'sun', glossIt: 'il sole', glossItPl: 'i soli', tags: ['nature'], de: { gender: 'f', plural: 'Sonnen' } },
+  // daily routine & time
+  { id: 'de/noun/frühstück', lang: 'de', lemma: 'Frühstück', gloss: 'breakfast', glossIt: 'la colazione', glossItPl: 'le colazioni', tags: ['food', 'daily-routine'], de: { gender: 'n', plural: 'Frühstücke' } },
+  { id: 'de/noun/abendessen', lang: 'de', lemma: 'Abendessen', gloss: 'dinner', glossIt: 'la cena', glossItPl: 'le cene', tags: ['food', 'daily-routine'], de: { gender: 'n', plural: 'Abendessen' } },
+  { id: 'de/noun/morgen', lang: 'de', lemma: 'Morgen', gloss: 'morning', glossIt: 'la mattina', glossItPl: 'le mattine', tags: ['time'], de: { gender: 'm', plural: 'Morgen' } },
+  { id: 'de/noun/abend', lang: 'de', lemma: 'Abend', gloss: 'evening', glossIt: 'la sera', glossItPl: 'le sere', tags: ['time'], de: { gender: 'm', plural: 'Abende' } },
+  { id: 'de/noun/stunde', lang: 'de', lemma: 'Stunde', gloss: 'hour', glossIt: 'l’ora', glossItPl: 'le ore', tags: ['time'], de: { gender: 'f', plural: 'Stunden' } },
+  { id: 'de/noun/minute', lang: 'de', lemma: 'Minute', gloss: 'minute', glossIt: 'il minuto', glossItPl: 'i minuti', tags: ['time'], de: { gender: 'f', plural: 'Minuten' } },
 ]
 
 export const DE_NOUN_BY_ID = new Map(DE_NOUNS.map((n) => [n.id, n]))

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { genCaseArticleDrill, genConjugationDrillDe, genPluralDrillDe } from './exercises-de'
+import { genCaseArticleDrill, genConjugationDrillDe, genPerfectDrill, genPluralDrillDe } from './exercises-de'
 import { genWordOrder } from './exercises'
 import { DE_VERB_BY_ID } from '../content/de/morphology/verbs'
 import { DE_NOUN_BY_ID } from '../content/de/morphology/nouns'
@@ -73,6 +73,46 @@ describe('German plural drill', () => {
     expect(ex.answer).toBe('Männer')
     expect(ex.strictSuffixLen).toBe('Männer'.length)
     expect(ex.sentence).toEqual(['der', 'Mann', '→', 'die', '___'])
+  })
+})
+
+describe('perfect drill', () => {
+  const essen = DE_VERB_BY_ID.get('de/verb/essen')!
+  const kommen = DE_VERB_BY_ID.get('de/verb/kommen')!
+  const aux = {
+    haben: DE_VERB_BY_ID.get('de/verb/haben')!,
+    sein: DE_VERB_BY_ID.get('de/verb/sein')!,
+  }
+
+  it('aux mode: haben-verb offers sein as wrongAux distractor', () => {
+    const strategies = new Set<string>()
+    for (let i = 0; i < 20; i++) {
+      const ex = genPerfectDrill(essen, {
+        mode: 'aux', person: '1sg', topicId: 't', cellId: 'aux', auxVerbs: aux, seed: `s${i}`, primary: 'en',
+      })
+      expect(ex.answer).toBe('habe')
+      expect(ex.sentence).toEqual(['Ich', '___', 'gegessen'])
+      for (const o of ex.options!) if (o.strategy) strategies.add(o.strategy)
+    }
+    expect(strategies.has('wrongAux')).toBe(true)
+  })
+
+  it('sein-verb: er ist gekommen', () => {
+    const ex = genPerfectDrill(kommen, {
+      mode: 'aux', person: '3sg', topicId: 't', cellId: 'aux', auxVerbs: aux, seed: 's', primary: 'en',
+    })
+    expect(ex.answer).toBe('ist')
+    expect(ex.sentence[2]).toBe('gekommen')
+  })
+
+  it('participle mode is a cloze on the participle', () => {
+    const ex = genPerfectDrill(essen, {
+      mode: 'participle', person: '1pl', topicId: 't', cellId: 'part', auxVerbs: aux, seed: 's', primary: 'it',
+    })
+    expect(ex.type).toBe('cloze')
+    expect(ex.answer).toBe('gegessen')
+    expect(ex.sentence).toEqual(['Wir', 'haben', '___', '(essen)'])
+    expect(ex.gloss).toBe('noi abbiamo mangiato')
   })
 })
 

@@ -9,6 +9,7 @@ import type {
   Topic,
 } from '../content/types'
 import { loc } from '../content/types'
+import type { VerbEntry } from '../content/types'
 import {
   adjById,
   lexemeByKey,
@@ -35,6 +36,7 @@ import {
   genCaseArticleDrill,
   genConjugationDrillDe,
   genMatchDrillDe,
+  genPerfectDrill,
   genPluralDrillDe,
 } from './exercises-de'
 import {
@@ -127,6 +129,12 @@ function locHints(
   return out
 }
 
+function perfectAuxVerbs(): { haben: VerbEntry; sein: VerbEntry } | null {
+  const haben = verbById('de/verb/haben')
+  const sein = verbById('de/verb/sein')
+  return haben && sein ? { haben, sein } : null
+}
+
 /** derive the card meta (lang/kind/source) from a skill id */
 export function metaForSkill(skillId: string): CardMeta {
   const lang: Lang = skillId.startsWith('de') ? 'de' : 'es'
@@ -154,7 +162,15 @@ function expandDrill(
       const verb = verbById(spec.verbId)
       if (!verb) return []
       return de
-        ? [genMatchDrillDe({ verb, topicId: topic.id, seed: seed(0), primary })]
+        ? [
+            genMatchDrillDe({
+              verb,
+              topicId: topic.id,
+              seed: seed(0),
+              primary,
+              tense: spec.tense === 'praet' ? 'praet' : 'pres',
+            }),
+          ]
         : [genMatchDrill({ verb, tense: spec.tense, topicId: topic.id, seed: seed(0), primary })]
     }
     case 'conj': {
@@ -169,6 +185,7 @@ function expandDrill(
               type: spec.type,
               seed: seed(j),
               primary,
+              tense: spec.tense === 'praet' ? 'praet' : 'pres',
             })
           : genConjugationDrill({
               verb,
@@ -251,6 +268,29 @@ function expandDrill(
     }
     case 'word-order':
       return spec.items.map((item, j) => genWordOrder(item, topic.lang, topic.id, seed(j), primary))
+    case 'perfect': {
+      const auxVerbs = perfectAuxVerbs()
+      if (!auxVerbs) return []
+      const rand = mulberry32(hashSeed(seed('pf')))
+      const verbs = shuffled(
+        spec.verbIds.map(verbById).filter((v) => !!v),
+        rand,
+      ).slice(0, spec.count)
+      return verbs.map((verb, j) => {
+        const mode =
+          spec.mode === 'mix' ? (j % 2 === 0 ? 'aux' : 'participle') : spec.mode
+        const person = spec.persons[j % spec.persons.length]
+        return genPerfectDrill(verb, {
+          mode,
+          person,
+          topicId: topic.id,
+          cellId: spec.cellId,
+          auxVerbs,
+          seed: seed(j),
+          primary,
+        })
+      })
+    }
     case 'authored':
       // authored glosses are localizable; resolve them here
       return spec.exercises.map((e) => ({ ...e, gloss: loc(e.gloss, primary) }))
@@ -345,7 +385,15 @@ export function reviewExerciseForSkill(
     const type = card.srs.intervalDays >= 3 ? 'cloze' : 'mc'
     const person = cellId as PersonKey
     return de
-      ? genConjugationDrillDe({ verb, person, topicId, type, seed, primary })
+      ? genConjugationDrillDe({
+          verb,
+          person,
+          topicId,
+          type,
+          seed,
+          primary,
+          tense: conjSpec.tense === 'praet' ? 'praet' : 'pres',
+        })
       : genConjugationDrill({ verb, tense: conjSpec.tense, person, topicId, type, seed, primary })
   }
 
@@ -375,6 +423,17 @@ export function reviewExerciseForSkill(
       seed,
       primary,
     })
+  }
+
+  // perfect-tense cells
+  for (const spec of topic.drillItems) {
+    if (spec.gen !== 'perfect' || spec.cellId !== cellId) continue
+    const auxVerbs = perfectAuxVerbs()
+    const verb = verbById(shuffled(spec.verbIds, rand)[0])
+    if (!verb || !auxVerbs) return null
+    const mode = spec.mode === 'participle' ? 'participle' : rand() < 0.5 ? 'aux' : 'participle'
+    const person = spec.persons[Math.floor(rand() * spec.persons.length)]
+    return genPerfectDrill(verb, { mode, person, topicId, cellId, auxVerbs, seed, primary })
   }
 
   // word-order cells

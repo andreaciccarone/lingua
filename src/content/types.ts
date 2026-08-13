@@ -222,6 +222,14 @@ export type DrillSpec =
       gen: 'word-order'
       items: { answer: string; also?: string[]; gloss: LocText; cellId: string }[]
     }
+  | {
+      gen: 'perfect'
+      verbIds: string[]
+      count: number
+      mode: 'aux' | 'participle' | 'mix'
+      persons: PersonKey[]
+      cellId: string
+    }
   | { gen: 'authored'; exercises: AuthoredExerciseInstance[] }
 
 /** A skill is the SRS unit: "topicId:cellId" for grammar, "lang/vocab/lemma:side" for words. */
