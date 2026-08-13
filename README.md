@@ -17,8 +17,9 @@ backend — all progress in on-device IndexedDB.
   preterite, imperfect, present perfect, imperative and por/para) and German (7 units, 33 topics:
   der/die/das through the Perfekt, adjective endings, past modals, werden-future and subordinate
   clauses). Every topic has an explanation, paradigm tables, worked examples and generated drills.
-  37 thematic vocab packs; lexicons: es 353 words (83 verbs/211 nouns/59 adjectives),
-  de 298 words (64 verbs/203 nouns/31 adjectives) — every word with Italian glosses.
+  49 thematic vocab packs; lexicons: es 496 words, de 437 words — every word with Italian
+  glosses. 16 leveled reading passages (8 per language) with comprehension questions, each
+  locked to its unit's grammar.
 - **Engines:** Spanish conjugator — present, preterite, imperfect (era/iba/veía) and present
   perfect (haber + participles incl. hecho/visto/escrito), with stem changes, yo-irregulars,
   spelling rules and reflexives — plus article/plural/adjective agreement; German conjugator
@@ -30,7 +31,8 @@ backend — all progress in on-device IndexedDB.
 - **SRS:** SM-2-lite with automatic grading; the card is a grammar *skill* (e.g. "tú-form of -ar
   verbs", "accusative masculine"), so reviews always get freshly generated exercises.
 - **Exercises:** multiple choice, typed cloze (accent bar, morpheme-aware typo tolerance),
-  match pairs, word-order tiles (German V2!), flashcards, listening (device TTS).
+  match pairs, word-order tiles (German V2!), flashcards, listening (device TTS), and reading
+  passages with glossaries and target-language comprehension questions.
 - **Extras:** streaks with earned freezes, XP goals, per-topic mastery, weakest-skill drills,
   JSON backup/restore, per-language TTS voice picker.
 

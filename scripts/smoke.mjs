@@ -154,6 +154,25 @@ try {
   await playSession('review')
   await page.screenshot({ path: `${shotDir}/5-review-done.png` })
 
+  // 5b. play the first reading passage (best-effort answers; completion is the test)
+  await page.locator('nav').getByText('Learn', { exact: true }).click()
+  await page.getByText('Lingua', { exact: true }).waitFor()
+  if (await page.getByText('Read', { exact: true }).first().isVisible().catch(() => false)) {
+    await page.getByText('Read', { exact: true }).first().click()
+    await page.getByRole('button', { name: 'Answer the questions' }).waitFor()
+    await page.screenshot({ path: `${shotDir}/8-reading-text.png` })
+    await page.getByRole('button', { name: 'Answer the questions' }).click()
+    for (let i = 0; i < 8; i++) {
+      if (await page.getByText('Reading complete').isVisible().catch(() => false)) break
+      await page.locator('main button.block').first().click()
+      await page.getByRole('button', { name: 'Continue' }).click()
+      await page.waitForTimeout(200)
+    }
+    await page.getByText('Reading complete').waitFor()
+    await page.screenshot({ path: `${shotDir}/9-reading-done.png` })
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+
   // 6. switch to German and play the first German topic
   await page.locator('nav').getByText('Learn', { exact: true }).click()
   await page.getByText('Deutsch').click()

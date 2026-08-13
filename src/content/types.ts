@@ -278,6 +278,30 @@ export interface ExerciseInstance {
  *  ExerciseInstance (gloss: string) when the session is built */
 export type AuthoredExerciseInstance = Omit<ExerciseInstance, 'gloss'> & { gloss: LocText }
 
+// ---------- Reading passages ----------
+
+export interface ReadingQuestion {
+  /** target-language comprehension question */
+  prompt: string
+  /** exactly one option without a strategy = the correct answer */
+  options: ExerciseOption[]
+  answer: string
+}
+
+export interface ReadingPassage {
+  id: string // 'es-read-mercado'
+  lang: Lang
+  unitId: string // shown on this unit's path
+  title: string // target-language title
+  /** one-line description in the instruction language */
+  blurb: LocText
+  /** target-language text; blank line = paragraph break */
+  text: string
+  /** tricky words: [target form as it appears, meaning] */
+  glossary: [string, LocText][]
+  questions: ReadingQuestion[]
+}
+
 export interface AuthoredExercise {
   id: string // "es-u1-ex-001"
   lang: Lang

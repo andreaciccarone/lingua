@@ -123,6 +123,13 @@ const STRINGS = {
   },
   pluralOf: { en: 'plural of “{noun}”', it: 'plurale di “{noun}”' },
   testVoice: { en: 'Test voice', it: 'Prova la voce' },
+  readingLabel: { en: 'Reading', it: 'Lettura' },
+  readBtn: { en: 'Read', it: 'Leggi' },
+  glossaryTitle: { en: 'Vocabulary help', it: 'Aiuto lessicale' },
+  answerQuestions: { en: 'Answer the questions', it: 'Rispondi alle domande' },
+  questionOf: { en: 'Question {n} of {total}', it: 'Domanda {n} di {total}' },
+  readingComplete: { en: 'Reading complete', it: 'Lettura completata' },
+  backToText: { en: 'Back to the text', it: 'Torna al testo' },
 } satisfies Record<string, { en: string; it: string }>
 
 export type UiKey = keyof typeof STRINGS

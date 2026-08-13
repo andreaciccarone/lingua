@@ -440,6 +440,143 @@ export const ES_PACK_TIME: VocabPack = {
   ],
 }
 
+export const ES_PACK_HOUSE2: VocabPack = {
+  id: 'es-pack-house2',
+  lang: 'es',
+  unitId: 'es-u3',
+  title: { en: 'Home 2', it: 'In casa 2' },
+  lexemeIds: [
+    'es/noun/llave',
+    'es/noun/escalera',
+    'es/noun/ascensor',
+    'es/noun/pared',
+    'es/noun/suelo',
+    'es/noun/techo',
+    'es/noun/horno',
+    'es/noun/nevera',
+    'es/noun/lavadora',
+    'es/noun/toalla',
+    'es/noun/jabón',
+    'es/noun/almohada',
+    'es/verb/cerrar',
+    'es/verb/romper',
+  ],
+}
+
+export const ES_PACK_RESTAURANT: VocabPack = {
+  id: 'es-pack-restaurant',
+  lang: 'es',
+  unitId: 'es-u4',
+  title: { en: 'Eating out', it: 'Al ristorante' },
+  lexemeIds: [
+    'es/noun/camarero',
+    'es/noun/camarera',
+    'es/noun/cuenta',
+    'es/noun/propina',
+    'es/noun/menú',
+    'es/noun/carnicería',
+    'es/noun/panadería',
+    'es/noun/rebajas',
+    'es/noun/talla',
+    'es/noun/bolsa',
+    'es/noun/caja',
+    'es/noun/tarjeta',
+    'es/noun/efectivo',
+    'es/verb/probar',
+    'es/verb/traer',
+  ],
+}
+
+export const ES_PACK_SCHOOL: VocabPack = {
+  id: 'es-pack-school',
+  lang: 'es',
+  unitId: 'es-u5',
+  title: { en: 'Learning Spanish', it: 'Imparare lo spagnolo' },
+  lexemeIds: [
+    'es/noun/gramática',
+    'es/noun/ejercicio',
+    'es/noun/error',
+    'es/noun/nivel',
+    'es/noun/curso',
+    'es/noun/página',
+    'es/noun/cuaderno',
+    'es/noun/bolígrafo',
+    'es/noun/lápiz',
+    'es/noun/significado',
+    'es/verb/intentar',
+    'es/verb/responder',
+    'es/verb/conseguir',
+  ],
+}
+
+export const ES_PACK_ANIMALS: VocabPack = {
+  id: 'es-pack-animals',
+  lang: 'es',
+  unitId: 'es-u6',
+  title: { en: 'Animals & nature 2', it: 'Animali e natura 2' },
+  lexemeIds: [
+    'es/noun/animal',
+    'es/noun/pájaro',
+    'es/noun/perro',
+    'es/noun/gato',
+    'es/noun/caballo',
+    'es/noun/pez',
+    'es/noun/vaca',
+    'es/noun/isla',
+    'es/noun/piedra',
+    'es/noun/hierba',
+    'es/noun/hoja',
+    'es/noun/campo',
+    'es/noun/bosque',
+  ],
+}
+
+export const ES_PACK_TRAVEL2: VocabPack = {
+  id: 'es-pack-travel2',
+  lang: 'es',
+  unitId: 'es-u7',
+  title: { en: 'Travel 2', it: 'In viaggio 2' },
+  lexemeIds: [
+    'es/noun/pasaporte',
+    'es/noun/frontera',
+    'es/noun/reserva',
+    'es/noun/habitación',
+    'es/noun/llegada',
+    'es/noun/retraso',
+    'es/noun/andén',
+    'es/noun/vuelo',
+    'es/noun/equipaje',
+    'es/noun/turismo',
+    'es/noun/guía',
+    'es/noun/mapa',
+    'es/verb/seguir',
+  ],
+}
+
+export const ES_PACK_ESSENTIALS: VocabPack = {
+  id: 'es-pack-essentials',
+  lang: 'es',
+  unitId: 'es-u7',
+  title: { en: 'Essential words', it: 'Parole essenziali' },
+  lexemeIds: [
+    'es/noun/cosa',
+    'es/noun/vez',
+    'es/noun/vida',
+    'es/noun/mundo',
+    'es/noun/historia',
+    'es/noun/luz',
+    'es/noun/fuego',
+    'es/noun/aire',
+    'es/noun/color',
+    'es/noun/forma',
+    'es/noun/parte',
+    'es/noun/lado',
+    'es/noun/centro',
+    'es/noun/final',
+    'es/noun/principio',
+  ],
+}
+
 export const ES_PACKS: VocabPack[] = [
   ES_PACK_BASICS,
   ES_PACK_FAMILY,
@@ -461,6 +598,12 @@ export const ES_PACKS: VocabPack[] = [
   ES_PACK_CITY,
   ES_PACK_FOOD2,
   ES_PACK_TIME,
+  ES_PACK_HOUSE2,
+  ES_PACK_RESTAURANT,
+  ES_PACK_SCHOOL,
+  ES_PACK_ANIMALS,
+  ES_PACK_TRAVEL2,
+  ES_PACK_ESSENTIALS,
 ]
 
 /** lemma-key ("casa") -> lexeme, for resolving vocab skill ids back to words */

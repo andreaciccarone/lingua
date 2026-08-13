@@ -5,6 +5,8 @@ import { ES_TOPICS, ES_UNITS } from './es'
 import { DE_TOPICS, DE_UNITS } from './de'
 import { ES_PACKS } from './es/packs'
 import { DE_PACKS } from './de/packs'
+import { ES_READINGS } from './es/readings'
+import { DE_READINGS } from './de/readings'
 import { adjById, lexemeByKey, nounById, packLexemes, topicById, verbById } from './registry'
 import { buildTopicLesson, reviewExerciseForSkill } from '../engine/session'
 import { initialSrs } from '../engine/srs/scheduler'
@@ -211,6 +213,41 @@ describe('lexicon', () => {
         .map((id) => id.split('/').pop()!)
       for (const key of keys) {
         expect(lexemeByKey(lang, key), `${lang} key ${key} does not resolve`).toBeDefined()
+      }
+    }
+  })
+})
+
+describe('reading passages', () => {
+  const ALL_READINGS = [...ES_READINGS, ...DE_READINGS]
+
+  it('ids unique, unit exists, blurb/glossary localized', () => {
+    const ids = ALL_READINGS.map((r) => r.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const r of ALL_READINGS) {
+      expect(
+        ALL_UNITS.some((u) => u.id === r.unitId && u.lang === r.lang),
+        `${r.id}: unknown unit ${r.unitId}`,
+      ).toBe(true)
+      expect(typeof r.blurb === 'object', `${r.id}: blurb must be bilingual`).toBe(true)
+      for (const [, meaning] of r.glossary) {
+        expect(typeof meaning === 'object', `${r.id}: glossary must be bilingual`).toBe(true)
+      }
+    }
+  })
+
+  it('passages are substantial and questions well formed', () => {
+    for (const r of ALL_READINGS) {
+      const words = r.text.split(/\s+/).length
+      expect(words, `${r.id}: too short (${words} words)`).toBeGreaterThanOrEqual(50)
+      expect(r.questions.length, `${r.id}: needs ≥3 questions`).toBeGreaterThanOrEqual(3)
+      for (const q of r.questions) {
+        const correct = q.options.filter((o) => !o.strategy)
+        expect(correct.length, `${r.id}: q needs exactly 1 correct`).toBe(1)
+        expect(correct[0].text).toBe(q.answer)
+        expect(q.options.length, `${r.id}: q needs ≥3 options`).toBeGreaterThanOrEqual(3)
+        const texts = q.options.map((o) => o.text)
+        expect(new Set(texts).size, `${r.id}: duplicate options`).toBe(texts.length)
       }
     }
   })

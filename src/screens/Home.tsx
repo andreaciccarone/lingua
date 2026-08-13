@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
-import { BookA, Check, Flame, Hourglass, Lock } from 'lucide-react'
+import { BookA, BookOpen, Check, Flame, Hourglass, Lock } from 'lucide-react'
 import type { Lang } from '../content/types'
 import { loc } from '../content/types'
-import { packsFor, topicById, unitsFor, upcomingUnitsFor } from '../content/registry'
+import { packsFor, readingsFor, topicById, unitsFor, upcomingUnitsFor } from '../content/registry'
 import { useT } from '../i18n/ui'
 import { getAllLessons, getDays } from '../data/db'
 import { computeStreak, xpOn } from '../data/stats'
@@ -123,6 +123,35 @@ export default function Home() {
                   <div key={tid}>{row}</div>
                 )
               })}
+              {readingsFor(lang)
+                .filter((r) => r.unitId === unit.id)
+                .map((r) => {
+                  const done = completed.has(r.id)
+                  return (
+                    <Link key={r.id} href={`/reading/${r.id}`} className="block">
+                      <li
+                        className={`flex items-center justify-between rounded-2xl border p-4 ${
+                          done ? 'border-sky-200 bg-sky-50' : 'border-sky-200 bg-white shadow-sm'
+                        }`}
+                      >
+                        <div className="flex min-w-0 items-center gap-2 pr-3">
+                          <BookOpen size={16} className="shrink-0 text-sky-500" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-sky-500">{t('readingLabel')}</p>
+                            <p className="truncate font-semibold">{r.title}</p>
+                          </div>
+                        </div>
+                        {done ? (
+                          <Check size={18} className="shrink-0 text-sky-500" />
+                        ) : (
+                          <span className="shrink-0 rounded-full bg-sky-600 px-3 py-1 text-xs font-semibold text-white">
+                            {t('readBtn')}
+                          </span>
+                        )}
+                      </li>
+                    </Link>
+                  )
+                })}
               {unit.packIds.map((pid) => {
                 const pack = packsFor(lang).find((p) => p.id === pid)
                 if (!pack) return null

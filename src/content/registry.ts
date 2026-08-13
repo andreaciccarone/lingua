@@ -1,5 +1,16 @@
 // One lookup surface over both languages' content.
-import type { AdjEntry, Lang, NounEntry, Topic, Unit, VerbEntry, VocabPack } from './types'
+import type {
+  AdjEntry,
+  Lang,
+  NounEntry,
+  ReadingPassage,
+  Topic,
+  Unit,
+  VerbEntry,
+  VocabPack,
+} from './types'
+import { ES_READINGS } from './es/readings'
+import { DE_READINGS } from './de/readings'
 import { ES_TOPIC_BY_ID, ES_UNITS, ES_UPCOMING_UNITS } from './es'
 import { ES_LEXEME_BY_KEY, ES_PACKS } from './es/packs'
 import { ES_VERB_BY_ID } from './es/morphology/verbs'
@@ -52,4 +63,12 @@ export function nounById(id: string): NounEntry | undefined {
 
 export function adjById(id: string): AdjEntry | undefined {
   return ES_ADJ_BY_ID.get(id) ?? DE_ADJ_BY_ID.get(id)
+}
+
+export function readingsFor(lang: Lang): ReadingPassage[] {
+  return lang === 'es' ? ES_READINGS : DE_READINGS
+}
+
+export function readingById(id: string): ReadingPassage | undefined {
+  return [...ES_READINGS, ...DE_READINGS].find((r) => r.id === id)
 }

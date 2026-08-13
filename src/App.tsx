@@ -12,6 +12,7 @@ import Stats from './screens/Stats'
 import Settings from './screens/Settings'
 import Lesson from './screens/Lesson'
 import TopicIntro from './screens/TopicIntro'
+import Reading from './screens/Reading'
 import InstallHint from './components/InstallHint'
 import UpdateToast from './components/UpdateToast'
 
@@ -75,6 +76,7 @@ export default function App() {
         {/* lessons and topic intros run fullscreen, outside the tab shell */}
         <Route path="/lesson/:id" component={Lesson} />
         <Route path="/topic/:id" component={TopicIntro} />
+        <Route path="/reading/:id" component={Reading} />
         <Route>
           <TabShell />
         </Route>
